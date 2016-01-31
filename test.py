@@ -38,3 +38,12 @@ data = np.array([
     [0.0080,   90.0000,   90.0000],
     [0.0100,   90.0000,   90.0000]])
     
+    
+strarray = np.chararray(4,1)
+strarray[0] = 'a'
+strarray[1] = 'b'
+strarray[2] = 'c'
+strarray[3] = 'd'
+
+geez = lambda x,y,width: (x*2 + 3, y+width)
+
