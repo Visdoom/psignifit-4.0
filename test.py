@@ -47,3 +47,4 @@ strarray[3] = 'd'
 
 geez = lambda x,y,width: (x*2 + 3, y+width)
 
+t = 'I just want to change something'
