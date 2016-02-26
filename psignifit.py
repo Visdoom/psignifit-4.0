@@ -18,6 +18,7 @@ You can find an explanation for all fields of the result in demo006
 To get an introduction to basic useage start with demo001
 """
 import numpy as np
+import datetime as dt
 import warnings
 
 def psignifit(data, options):
@@ -132,8 +133,6 @@ def psignifit(data, options):
     assert(max(data[:,0]) > min(data[:,0]), 
     'Your data does not have variance on the x-axis! This makes fitting impossible')
                  
-    # check GPU options
-    '''TODO!'''
                      
     '''
     log space sigmoids
@@ -155,12 +154,76 @@ def psignifit(data, options):
     
     if ~hasattr(options, 'priors'):
         options.priors = getStandardPriors(data, options)
-    elif:
-        #TODO!
+    else:
+        #TODO do I need to check for cell? 
+        priors = getStandardPriors(data, options)
         
+        for ipar in range(5):
+            if not(hasattr(options.priors[ipar], '__call__')):
+                options.priors[ipar] = priors[ipar]
+                
+        checkPriors(data, options)
+    if options.dynamicGrid and not(hasattr(options, 'GridSetEval')):
+        options.GridSetEval = 10000
+    if options.dynamicGrid and not(hasattr(options, 'UniformWeight')):
+        options.UniformWeight = 1
+
+    '''
+    initialize
+    '''        
     
+    #warning if many bloks were measured
+    if (len(np.unique(data[:,0])) >= 25) and (np.ravel(options.stimulusRange) == 1):
+        warnings.warn('psignifit:probablyAdaptive\n The data you supplied contained >= 25 stimulus levels.\n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
     
+    if all(data[:,2] <= 5) and (np.ravel(options.stimulusRange) == 1):
+        warnings.warn('psignifit:probablyAdaptive\n All provided data blocks contain <= 5 trials \n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
+    
+    #pool data if necessary: more than options.nblocks blocks or only 1 trial per block
+    if np.max(data[:,2]) == 1 or len(data) > options.nblocks:
+        warnings.warn('psignifit:pooling\n We pooled your data, to avoid problems with n=1 blocks or to save time fitting because you have a lot of blocks\n You can force acceptence of your blocks by increasing options.nblocks')
+        data = poolData(data, options)
+    
+    options.nblocks = len(data)
+    
+    # create function handle of sigmoid
+    options.sigmoidHandle = getSigmoidHandle(options)
+    
+    # borders of integration
+    if hasattr(options, 'borders'):
+        borders = setBorders(data, options)
+        options.borders[np.isnan(options.borders)] = borders[np.isnan(options.borders)]
+    else:
+        options.borders = setBorders(data,options)
+    options.borders[not(np.isnan(options.fixedPars)),0] = options.fixedPars[not(np.isnan(options.fixedPars))]
+    options.borders[not(np.isnan(options.fixedPars)),1] = options.fixedPars[not(np.isnan(options.fixedPars))]        
+            
+    # normalize priors to first hoice of borders
+    options.priors = normalizePriors(options)
+    if options.moveBorders:
+        options.borders = moveBorders(data, options)
+    
+    ''' core '''
+    result = psignifitCore(data,options)
         
-                 
-    result = 0
-    return[result]
+    ''' after processing '''
+    # check that the marginals go to nearly 0 at the borders of the grid
+    if options.verbose > -5:
+        #TODO check
+        if result.marginals[0][0] * result.marginalsW[0][0] > .001:
+            warnings.warn('psignifit:borderWarning\n The marginal for the threshold is not near 0 at the lower border\n This indicates that smaller Thresholds would be possible')
+        if result.marginals[0][-1] * result.marginalsW[0][-1] > .001:
+            warnings.warn('psignifit:borderWarning\n The marginal for the threshold is not near 0 at the upper border\n This indicates that your data is not sufficient to exclude much higher thresholds.\n Refer to the paper or the manual for more info on this topic')
+        if result.marginals[1][0] * result.marginalsW[1][0] > .001:
+            warnings.warn('psignifit:borderWarning\n The marginal for the width is not near 0 at the lower border\n This indicates that your data is not sufficient to exclude much lower widths.\n Refer to the paper or the manual for more info on this topic')
+        if result.marginals[1][-1] * result.marginalsW[1][-1] > .001:
+            warnings.warn('psignifit:borderWarning\n The marginal for the width is not near 0 at the lower border\n This indicates that your data is not sufficient to exclude much higher widths.\n Refer to the paper or the manual for more info on this topic')
+    
+    result.timestamp = dt.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    if options.instantPlot:
+        plotPsych(result)
+        plotBayes(result)
+       
+    
+    return result

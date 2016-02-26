@@ -34,7 +34,7 @@ def psignifitCore(data, options):
         elif options.expType == 'nAFC':
             calcSeed = lambda X: -logLikelihood(data, options, X[0], X[1], X[2], 1/options.expN, X[3])
             Seed = scipy.optimize.fmin(func=calcSeed, x0 = [Seed[0:2], Seed[4]])
-            Seed = [Seed[0:2], 1/options.expN, Seed[3]] #ToDo check wether row or colum vector
+            Seed = [Seed[0:2], 1/options.expN, Seed[3]] #ToDo check whether row or colum vector
         result.X1D = gridSetting(data,options, Seed) 
     
     
@@ -102,8 +102,7 @@ def psignifitCore(data, options):
         else:
             optimiseOptions = {'disp':False}
             #or maybe optimiseOptions = (_,_,_,_,_,False)
-        #lic = license('inuse')
-        ''' TODO License reading is it necessary?'''
+        
         Fit =scipy.optimize.fmin(func=fun, x0, optimiseOptions) #ToDo check if that works this way         
         
         if options.expType == 'YesNo':
