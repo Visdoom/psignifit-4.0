@@ -23,14 +23,14 @@ data = np.array([[ 0.0010,   45.0000,   90.0000],[0.0015,   50.0000,   90.0000],
 # psignifit versions. You can convert your data by using the reformat
 # comand. If you are a user of the older psignifits.
 
-''' construct an options struct'
- To start psignifit you need to pass a struct, which specifies, what kind
+''' construct an options dictionary'
+ To start psignifit you need to pass a dictionary, which specifies, what kind
  of experiment you did and any other parameters of the fit you might want
  to set: '''
 
-' You can create a struct by simply calling [name]=struct '
+' You can create an empty dictionary by simply calling [name]=lambda: 0 '
 
-options  = lambda: 0   # initialize as an empty struct
+options  = lambda: 0   # initialize as an empty dict
 
 'Now you can set the different options with lines of the form'
 '[name].[field] as in the following lines:'
