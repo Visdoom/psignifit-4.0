@@ -18,6 +18,11 @@ import copy
 import scipy
 import warnings
 
+from loglikelihood import loglikelihood 
+from gridSetting import gridSetting
+from getWeights import getWeights
+from getConfRegion import getConfRegion
+
 def psignifitCore(data, options):
     
     d = len(options.borders)
@@ -114,7 +119,7 @@ def psignifitCore(data, options):
         else:
             raise ValueError('unknown expType')
     
-    #TodO result.Fit[~np.isnan(options.fixedPars)] = options.fixedPars[~np.isnan(options.fixedPars)]
+    #TODO result.Fit[~np.isnan(options.fixedPars)] = options.fixedPars[~np.isnan(options.fixedPars)]
             
     elif options.estimateType == 'mean':
         # get mean estimate

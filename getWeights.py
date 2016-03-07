@@ -40,7 +40,7 @@ def getWeights(X1D):
         d = sum(Xlength > 1)
         weight = (2**(-d))* convn(weight, ones(dims))
     else:
-        weight = (2**(-1))*convolve(weight, np.array([[1],[1]])
+        weight = (2**(-1))*convolve(weight, array([[1],[1]]))
         
     return weight
 

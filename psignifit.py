@@ -15,13 +15,17 @@ program produced for your fit. You can pass this as whole to all further
 processing function provided with psignifit. Especially to the plot functions.
 You can find an explanation for all fields of the result in demo006
     
-To get an introduction to basic useage start with demo001
+To get an introduction to basic usage start with demo001
 """
 import numpy as np
 import datetime as dt
 import warnings
 
-from helperfunctions import getStandardPriors
+import priors as p
+import borders as b
+from poolData import poolData 
+from getSigmoidHandle import getSigmoidHandle
+from psignifitCore import psignifitCore
 
 def psignifit(data, options):
    
@@ -155,16 +159,16 @@ def psignifit(data, options):
         warnings.warn('psignifit:TresholdPCchanged\n You changed the percent correct corresponding to the threshold\n')    
     
     if ~hasattr(options, 'priors'):
-        options.priors = getStandardPriors(data, options)
+        options.priors = p.getStandardPriors(data, options)
     else:
         #TODO do I need to check for cell? 
-        priors = getStandardPriors(data, options)
+        priors = p.getStandardPriors(data, options)
         
         for ipar in range(5):
             if not(hasattr(options.priors[ipar], '__call__')):
                 options.priors[ipar] = priors[ipar]
                 
-        checkPriors(data, options)
+        p.checkPriors(data, options)
     if options.dynamicGrid and not(hasattr(options, 'GridSetEval')):
         options.GridSetEval = 10000
     if options.dynamicGrid and not(hasattr(options, 'UniformWeight')):
@@ -174,7 +178,7 @@ def psignifit(data, options):
     initialize
     '''        
     
-    #warning if many bloks were measured
+    #warning if many blocks were measured
     if (len(np.unique(data[:,0])) >= 25) and (np.ravel(options.stimulusRange) == 1):
         warnings.warn('psignifit:probablyAdaptive\n The data you supplied contained >= 25 stimulus levels.\n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
     
@@ -193,17 +197,17 @@ def psignifit(data, options):
     
     # borders of integration
     if hasattr(options, 'borders'):
-        borders = setBorders(data, options)
+        borders = b.setBorders(data, options)
         options.borders[np.isnan(options.borders)] = borders[np.isnan(options.borders)]
     else:
-        options.borders = setBorders(data,options)
+        options.borders = b.setBorders(data,options)
     options.borders[not(np.isnan(options.fixedPars)),0] = options.fixedPars[not(np.isnan(options.fixedPars))]
     options.borders[not(np.isnan(options.fixedPars)),1] = options.fixedPars[not(np.isnan(options.fixedPars))]        
             
     # normalize priors to first hoice of borders
-    options.priors = normalizePriors(options)
+    options.priors = p.normalizePriors(options)
     if options.moveBorders:
-        options.borders = moveBorders(data, options)
+        options.borders = b.moveBorders(data, options)
     
     ''' core '''
     result = psignifitCore(data,options)
@@ -223,9 +227,10 @@ def psignifit(data, options):
     
     result.timestamp = dt.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    if options.instantPlot:
-        plotPsych(result)
-        plotBayes(result)
+    #if options.instantPlot:
+        #plotPsych(result)
+        #plotBayes(result) TODO implement and uncomment
+    
        
     
     return result

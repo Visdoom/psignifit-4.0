@@ -33,7 +33,8 @@ data = np.array([
     [0.0080,   90.0000,   90.0000],
     [0.0100,   90.0000,   90.0000]])
     
-    
+
+
 
 res = ps.psignifit(data, options)
 

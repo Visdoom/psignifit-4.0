@@ -180,7 +180,7 @@ def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
             if hasattr(options.priors[4], '__call__'):
                 p = p + np.log(options.priors[4](varscaleOrig))
                 
-return p  
+    return p  
 
         
         
