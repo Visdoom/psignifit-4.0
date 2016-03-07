@@ -11,6 +11,7 @@ import scipy.io as importer
 import psignifit as ps
 from getSigmoidHandle import getSigmoidHandle 
 import priors as p
+from utils import my_betapdf
 
 
 data = np.array([
@@ -59,6 +60,9 @@ options.fastOptim   = 0
 options.mbStepN     = np.array([30,40,10,1,20])
 options.logspace    = 0
 options.priors      = p.getStandardPriors(data,options)
+
+x = np.linspace(0.001,.9,25)
+my_betapdf(x,1,10)
 p.checkPriors(data,options)
 #options.borders
 options.sigmoidHandle = getSigmoidHandle(options)
@@ -66,7 +70,7 @@ options.sigmoidHandle = getSigmoidHandle(options)
 temp_data= importer.loadmat('variables.mat', struct_as_record=True,matlab_compatible=True)
 temp_options = importer.loadmat('options.mat', struct_as_record=False, squeeze_me=True)
 
-    
+
 
 
 

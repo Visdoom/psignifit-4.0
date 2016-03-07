@@ -3,7 +3,7 @@
 Utils class capsulating all custom made probabilistic functions
 """
 
-from numpy import log, log1p, exp, sqrt, tan, pi, nan, isnan, inf, zeros, shape, ravel, tile
+from numpy import log, log1p, exp, sqrt, tan, pi, nan, isnan, inf, zeros, shape, ravel, tile, logical_and, logical_or
 from scipy.special import betainc,betaln,erfcinv, erfc
 
 def my_norminv(p,mu,sigma):
@@ -54,18 +54,18 @@ def my_betapdf(x,a,b):
         b = tile(b,shape(x))
 
     # Special cases
-    y[a==1 & x==0] = b[a==1 & x==0]
-    y[b==1 & x==1] = a[b==1 & x==1]
-    y[a<1 & x==0] = inf
-    y[b<1 & x==1] = inf
+    y[logical_and(a==1, x==0)] = b[logical_and(a==1 , x==0)]
+    y[logical_and(b==1 , x==1)] = a[logical_and(b==1 , x==1)]
+    y[logical_and(a<1 , x==0)] = inf
+    y[logical_and(b<1 , x==1)] = inf
 
     # Return NaN for out of range parameters.
     y[a<=0] = nan
     y[b<=0] = nan
-    y[isnan(a) | isnan(b) | isnan(x)] = nan
+    y[logical_or(logical_or(isnan(a), isnan(b)), isnan(x))] = nan
 
     # Normal values
-    k = a>0 & b>0 & x>0 & x<1
+    k = logical_and(logical_and(a>0, b>0),logical_and(x>0 , x<1))
     a = a[k]
     b = b[k]
     x = x[k]
@@ -77,7 +77,7 @@ def my_betapdf(x,a,b):
 
     logb = zeros(shape(x))
     logb[smallx] = (b[smallx]-1) * log1p(-x[smallx])
-    logb[not(smallx)] = (b[not(smallx)]-1) * log(1-x[not(smallx)])
+    logb[~smallx] = (b[~smallx]-1) * log(1-x[~smallx])
 
     y[k] = exp(loga+logb - betaln(a,b))
 
