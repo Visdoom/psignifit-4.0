@@ -201,8 +201,8 @@ def psignifit(data, options):
         options.borders[np.isnan(options.borders)] = borders[np.isnan(options.borders)]
     else:
         options.borders = b.setBorders(data,options)
-    options.borders[not(np.isnan(options.fixedPars)),0] = options.fixedPars[not(np.isnan(options.fixedPars))]
-    options.borders[not(np.isnan(options.fixedPars)),1] = options.fixedPars[not(np.isnan(options.fixedPars))]        
+    options.borders[np.logical_not(np.isnan(options.fixedPars)),0] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]
+    options.borders[np.logical_not(np.isnan(options.fixedPars)),1] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]        
             
     # normalize priors to first hoice of borders
     options.priors = p.normalizePriors(options)
