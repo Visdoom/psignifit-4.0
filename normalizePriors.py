@@ -33,3 +33,7 @@ def normalizePriors(options):
             priors[idx] = lambda x: 1
     
     return priors
+
+if __name__ == "__main__":
+    import sys
+    normalizePriors(sys.argv[1])

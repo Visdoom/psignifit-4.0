@@ -133,4 +133,8 @@ def psignifitCore(data, options):
         result.conf_Intervals = getConfRegion(result)
         
     return result
-            
+        
+if __name__ == "__main__":
+    import sys
+    psignifitCore(sys.argv[1], sys.argv[2])
+

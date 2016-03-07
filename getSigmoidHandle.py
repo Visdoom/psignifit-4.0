@@ -55,3 +55,7 @@ def getSigmoidHandle(options):
         handle = sigmoid
         
     return handle
+    
+if __name__ == "__main__":
+    import sys
+    getSigmoidHandle(sys.argv[1])

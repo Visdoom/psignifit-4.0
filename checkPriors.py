@@ -67,3 +67,6 @@ def testForWarnings(testResult, parameter):
     if any(testResult == 0):
         warnings.warn("the prior you provided for %s returns zeros" % parameter)
     
+if __name__ == "__main__":
+    import sys
+    checkPriors(sys.argv[1], sys.argv[2])

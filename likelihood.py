@@ -28,3 +28,8 @@ def likelihood(data, options, alpha, beta, l, gamma, varscale):
     p = np.exp(p)
     
     return (p,logPmax)
+
+if __name__ == "__main__":
+    import sys
+    likelihood(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+

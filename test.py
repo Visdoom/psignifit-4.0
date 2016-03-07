@@ -8,17 +8,12 @@ Created on Thu Nov 26 19:21:33 2015
 #from collection import namedtuple
 import numpy as np
 import scipy.io as importer
+import psignifit as ps
 options = lambda:0
 
-options.expType = '3AFC'
+options.sigmoidName = 'norm'   # choose a cumulative Gauss as the sigmoid
+options.expType     = '2AFC' 
 
-
-if options.expType == '2AFC' or options.expType == '3AFC' or options.expType == '4AFC':
-            
-        options.expN = int(float(options.expType[0]))
-        options.expType = 'nAFC'
-
-print(options.expN)
 
 temp_data= importer.loadmat('variables.mat', struct_as_record=True,matlab_compatible=True)
 temp_options = importer.loadmat('options.mat', struct_as_record=False, squeeze_me=True)
@@ -39,6 +34,9 @@ data = np.array([
     [0.0100,   90.0000,   90.0000]])
     
     
+
+res = ps.psignifit(data, options)
+
 strarray = np.chararray(4,1)
 strarray[0] = 'a'
 strarray[1] = 'b'

@@ -81,3 +81,11 @@ def getStandardPriors(data, options):
     
     return priors
     
+    
+    def __call__(self):
+        import sys
+        
+        return getStandardPriors(sys.argv[1], sys.argv[2])
+if __name__ == "__main__":
+    import sys
+    getStandardPriors(sys.argv[1], sys.argv[2])

@@ -21,6 +21,8 @@ import numpy as np
 import datetime as dt
 import warnings
 
+from helperfunctions import getStandardPriors
+
 def psignifit(data, options):
    
     #--------------------------------------------------------------------------
@@ -29,7 +31,7 @@ def psignifit(data, options):
     # data
     data = np.array(data)
                 # percent correct in data
-    if all(data[:,1] <= 1 & data[:,1] >= 0) and any(data[:,1] > 0 & data[:,1] < 1):
+    if all( np.logical_and(data[:,1] <= 1, data[:,1] >= 0)) and any(np.logical_and(data[:,1] > 0, data[:,1] < 1)):
         
         data[:,1] = round(map( lambda x, y: x*y, data[:,2],data[:,1])) # we try to convert into our notation
         
@@ -130,8 +132,8 @@ def psignifit(data, options):
     else:
         raise ValueError('You specified an illegal experiment type')
     
-    assert(max(data[:,0]) > min(data[:,0]), 
-    'Your data does not have variance on the x-axis! This makes fitting impossible')
+    #assert(max(data[:,0]) > min(data[:,0]),  TODO check if that is really meant this way
+    #'Your data does not have variance on the x-axis! This makes fitting impossible')
                  
                      
     '''
@@ -144,7 +146,7 @@ def psignifit(data, options):
     
     if options.sigmoidName in ['Weibull','logn','weibull']:
             options.logspace = 1
-            assert(min(data[:,0]) > 0, 'The sigmoid you specified is not defined for negative data points!')
+            assert min(data[:,0]) > 0, 'The sigmoid you specified is not defined for negative data points!'
     else:
         options.logspace = 0
         
@@ -227,3 +229,8 @@ def psignifit(data, options):
        
     
     return result
+    
+if __name__ == "__main__":
+    import sys
+    psignifit(sys.argv[1], sys.argv[2])
+

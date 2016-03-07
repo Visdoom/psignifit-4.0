@@ -14,6 +14,8 @@ from scipy.stats import beta as b
 import numpy as np
 import copy
 
+from helperfunctions import likelihood
+
 def gridSetting(data,options,Seed):
     
     # Initialisierung
@@ -131,3 +133,7 @@ def gridSetting(data,options,Seed):
         
         
     return X1D
+
+if __name__ == "__main__":
+    import sys
+    gridSetting(sys.argv[1], sys.argv[2], sys.argv[3])

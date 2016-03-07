@@ -43,3 +43,7 @@ def getWeights(X1D):
         weight = (2**(-1))*convolve(weight, np.array([[1],[1]])
         
     return weight
+
+if __name__ == "__main__":
+    import sys
+    getWeights(sys.argv[1])

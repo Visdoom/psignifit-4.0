@@ -59,3 +59,8 @@ def marginalize(result, dimension):
                   x = result.X1D[np.sort(dimension)]
                 
       return (marginal, x, weight)
+
+if __name__ == "__main__":
+    import sys
+    marginalize(sys.argv[1], sys.argv[2])
+

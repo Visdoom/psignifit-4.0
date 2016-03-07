@@ -59,3 +59,7 @@ def poolData(data,options):
         i = i + 1
         
     return array(pooledData).squeeze()
+
+if __name__ == "__main__":
+    import sys
+    poolData(sys.argv[1], sys.argv[2])

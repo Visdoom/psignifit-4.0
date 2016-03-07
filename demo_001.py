@@ -10,6 +10,7 @@
  detection experiment.
 """
 import numpy as np
+import psignifit as pf
 
 data = np.array([[ 0.0010,   45.0000,   90.0000],[0.0015,   50.0000,   90.0000],
                 [0.0020,   44.0000,   90.0000], [0.0025,   44.0000,   90.0000],
@@ -31,6 +32,7 @@ data = np.array([[ 0.0010,   45.0000,   90.0000],[0.0015,   50.0000,   90.0000],
 ' You can create an empty dictionary by simply calling [name]=lambda: 0 '
 
 options  = lambda: 0   # initialize as an empty dict
+
 
 'Now you can set the different options with lines of the form'
 '[name].[field] as in the following lines:'
@@ -74,7 +76,7 @@ options.expType     = '2AFC'   ''' choose 2-AFC as the paradigm of the experimen
  fitted function and can be passed to the many other functions in this
  toolbox, to further process the results. '''
 
-res = psignifit(data,options)
+res = pf.psignifit(data,options)
 
 ''' visualize the results
  For example you can use the result struct res to plot your psychometric

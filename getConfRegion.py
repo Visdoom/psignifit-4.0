@@ -122,3 +122,6 @@ def getConfRegion(result, nargout):
         i += 1
     return (conf_Intervals, confRegion)
 
+if __name__ == "__main__":
+    import sys
+    getConfRegion(sys.argv[1], sys.argv[2])

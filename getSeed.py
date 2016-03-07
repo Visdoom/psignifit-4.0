@@ -54,3 +54,6 @@ def getSeed(data,options):
             
     return Seed
 
+if __name__ == "__main__":
+    import sys
+    getSeed(sys.argv[1], sys.argv[2])

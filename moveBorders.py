@@ -57,4 +57,8 @@ def moveBorders(data,options):
         borders[idx,:] = [x1,x2]
     
     return borders
-    
+
+if __name__ == "__main__":
+    import sys
+    moveBorders(sys.argv[1], sys.argv[2])
+  
