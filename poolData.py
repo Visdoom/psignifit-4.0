@@ -54,7 +54,7 @@ def poolData(data,options):
             ntotal = sum(block[:,2])
             ncorrect = sum(block[:,1])
             level = sum(block[:,0]*block[:,2]/ntotal)
-            pooledData.append(array([level,ncorrect, ntotal])
+            pooledData.append(array([level,ncorrect, ntotal]))
         
         i = i + 1
         

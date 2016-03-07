@@ -18,14 +18,19 @@ import copy
 import scipy
 import warnings
 
-from loglikelihood import loglikelihood 
+import likelihood as l 
+
 from gridSetting import gridSetting
 from getWeights import getWeights
 from getConfRegion import getConfRegion
+from getSeed import getSeed
+from marginalize import marginalize
+
 
 def psignifitCore(data, options):
     
     d = len(options.borders)
+    result = lambda:0
     
     '''Choose grid dynamically from data'''
     if options.dynamicGrid:
@@ -34,10 +39,10 @@ def psignifitCore(data, options):
         
         # further optimize the logliklihood to obtain a good estimate of the MAP
         if options.expType == 'YesNo':
-            calcSeed = lambda X: -logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
+            calcSeed = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
             Seed = scipy.optimize.fmin(func=calcSeed, x0 = Seed)
         elif options.expType == 'nAFC':
-            calcSeed = lambda X: -logLikelihood(data, options, X[0], X[1], X[2], 1/options.expN, X[3])
+            calcSeed = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], 1/options.expN, X[3])
             Seed = scipy.optimize.fmin(func=calcSeed, x0 = [Seed[0:2], Seed[4]])
             Seed = [Seed[0:2], 1/options.expN, Seed[3]] #ToDo check whether row or colum vector
         result.X1D = gridSetting(data,options, Seed) 
@@ -60,7 +65,7 @@ def psignifitCore(data, options):
                     
     '''Evaluate likelihood and form it into a posterior'''
     
-    [result.Posterior, result.logPmax] = likelihood(data, options, result.X1D[:])
+    [result.Posterior, result.logPmax] = l.likelihood(data, options, result.X1D[:])
     result.weight = getWeights(result.X1D)
     integral = np.sum(np.array(result.Posterior[:])*np.array(result.weight[:]))
     result.Posterior = result.Posterior/integral
@@ -84,15 +89,15 @@ def psignifitCore(data, options):
             Fit[idx] = result.X1D[idx](index[idx]) #ToDo the round braces?
         
         if options.expType == 'YesNo':
-            fun = lambda:X -logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
+            fun = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
             x0 = copy.deepcopy(Fit)
         elif options.expType == 'nAFC':
-            fun = lambda:X -logLikelihood(data,options, X[0], X[1], X[2], 1/options.expN, x[3])
+            fun = lambda X:  -l.logLikelihood(data,options, X[0], X[1], X[2], 1/options.expN, X[3])
             x0 = copy.deepcopy(Fit[0:2])
             x0 = np.append(x0,Fit[4])
             x0 = np.transpose(x0)
         elif options.expType == 'equalAsymptote':
-            fun = lambda:X -logLikelihood(data,options, X[0], X[1], X[2], np.nan, X[3])
+            fun = lambda X: -l.logLikelihood(data,options, X[0], X[1], X[2], np.nan, X[3])
             x0 = copy.deepcopy(Fit[0:2])
             x0 = np.append(x0,Fit[4])
             x0 = np.transpose(x0)
@@ -108,7 +113,7 @@ def psignifitCore(data, options):
             optimiseOptions = {'disp':False}
             #or maybe optimiseOptions = (_,_,_,_,_,False)
         
-        Fit =scipy.optimize.fmin(func=fun, x0, optimiseOptions) #ToDo check if that works this way         
+        Fit =scipy.optimize.fmin(fun, x0, optimiseOptions) #ToDo check if that works this way         
         
         if options.expType == 'YesNo':
             result.Fit = copy.deepcopy(Fit)
@@ -128,7 +133,7 @@ def psignifitCore(data, options):
             Fit[idx] = np.sum(np.array(result.marginals[idx])*np.array(result.marginalsW[idx])*np.array(result.marginalsX[idx]))
         
         result.Fit = copy.deepcopy(Fit)
-        clear(Fit)
+        Fit = np.empty(Fit.shape)
     '''Include input into result'''
     result.options = options # no copies here, because they are not changing
     result.data = data
