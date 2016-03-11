@@ -156,7 +156,8 @@ def psignifit(data, options):
         
     # add priors
     if options.threshPC != .5 and not(hasattr(options, 'priors')):
-        warnings.warn('psignifit:TresholdPCchanged\n You changed the percent correct corresponding to the threshold\n')    
+        warnings.warn('psignifit:TresholdPCchanged\n'\
+            'You changed the percent correct corresponding to the threshold\n')    
     
     if ~hasattr(options, 'priors'):
         options.priors = p.getStandardPriors(data, options)
@@ -180,14 +181,28 @@ def psignifit(data, options):
     
     #warning if many blocks were measured
     if (len(np.unique(data[:,0])) >= 25) and (np.ravel(options.stimulusRange) == 1):
-        warnings.warn('psignifit:probablyAdaptive\n The data you supplied contained >= 25 stimulus levels.\n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
+        warnings.warn('psignifit:probablyAdaptive\n'\
+            'The data you supplied contained >= 25 stimulus levels.\n'\
+            'Did you sample adaptively?\n'\
+            'If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n'\
+            'This will allow psignifit to choose an appropriate prior.\n'\
+            'For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels,\n'\
+            'which is frequently invalid for adaptive procedures!')
     
     if all(data[:,2] <= 5) and (np.ravel(options.stimulusRange) == 1):
-        warnings.warn('psignifit:probablyAdaptive\n All provided data blocks contain <= 5 trials \n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
+        warnings.warn('psignifit:probablyAdaptive\n'\
+            'All provided data blocks contain <= 5 trials \n'\
+            'Did you sample adaptively?\n'\
+            'If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n'\
+            'This will allow psignifit to choose an appropriate prior.\n'\
+            'For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels,\n'\
+            'which is frequently invalid for adaptive procedures!')
     
     #pool data if necessary: more than options.nblocks blocks or only 1 trial per block
     if np.max(data[:,2]) == 1 or len(data) > options.nblocks:
-        warnings.warn('psignifit:pooling\n We pooled your data, to avoid problems with n=1 blocks or to save time fitting because you have a lot of blocks\n You can force acceptence of your blocks by increasing options.nblocks')
+        warnings.warn('psignifit:pooling\n'\
+            'We pooled your data, to avoid problems with n=1 blocks or to save time fitting because you have a lot of blocks\n'\
+            'You can force acceptence of your blocks by increasing options.nblocks')
         data = poolData(data, options)
     
     options.nblocks = len(data)
@@ -217,13 +232,24 @@ def psignifit(data, options):
     if options.verbose > -5:
         #TODO check
         if result.marginals[0][0] * result.marginalsW[0][0] > .001:
-            warnings.warn('psignifit:borderWarning\n The marginal for the threshold is not near 0 at the lower border\n This indicates that smaller Thresholds would be possible')
+            warnings.warn('psignifit:borderWarning\n'\
+                'The marginal for the threshold is not near 0 at the lower border.\n'\
+                'This indicates that smaller Thresholds would be possible.')
         if result.marginals[0][-1] * result.marginalsW[0][-1] > .001:
-            warnings.warn('psignifit:borderWarning\n The marginal for the threshold is not near 0 at the upper border\n This indicates that your data is not sufficient to exclude much higher thresholds.\n Refer to the paper or the manual for more info on this topic')
+            warnings.warn('psignifit:borderWarning\n'\
+                'The marginal for the threshold is not near 0 at the upper border.\n'\
+                'This indicates that your data is not sufficient to exclude much higher thresholds.\n'\
+                'Refer to the paper or the manual for more info on this topic.')
         if result.marginals[1][0] * result.marginalsW[1][0] > .001:
-            warnings.warn('psignifit:borderWarning\n The marginal for the width is not near 0 at the lower border\n This indicates that your data is not sufficient to exclude much lower widths.\n Refer to the paper or the manual for more info on this topic')
+            warnings.warn('psignifit:borderWarning\n'\
+                'The marginal for the width is not near 0 at the lower border.\n'\
+                'This indicates that your data is not sufficient to exclude much lower widths.\n'\
+                'Refer to the paper or the manual for more info on this topic.')
         if result.marginals[1][-1] * result.marginalsW[1][-1] > .001:
-            warnings.warn('psignifit:borderWarning\n The marginal for the width is not near 0 at the lower border\n This indicates that your data is not sufficient to exclude much higher widths.\n Refer to the paper or the manual for more info on this topic')
+            warnings.warn('psignifit:borderWarning\n'\
+                'The marginal for the width is not near 0 at the lower border.\n'\
+                'This indicates that your data is not sufficient to exclude much higher widths.\n'\
+                'Refer to the paper or the manual for more info on this topic.')
     
     result.timestamp = dt.now().strftime("%Y-%m-%d %H:%M:%S")
     
