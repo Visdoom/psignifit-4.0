@@ -41,7 +41,7 @@ def getStandardPriors(data, options):
         data[:,0] = np.log(data[:,0])
         
     ''' of range was not given take it from data '''
-    if np.ravel(options.stimulusRange) <= 1:
+    if np.ravel(options.stimulusRange).size <= 1:
         options.stimulusRange = np.array([np.min(data[:,0]), np.max(data[:,0])])
         stimRangeSet = False
     else:

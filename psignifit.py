@@ -120,18 +120,18 @@ def psignifit(data, options):
         options.expN = int(float(options.expType[0]))
         options.expType = 'nAFC'
 
-    if options.expType == 'nAFC' and ~hasattr(options,'expN'):
+    if options.expType == 'nAFC' and not(hasattr(options,'expN')):
         raise ValueError('For nAFC experiments please also pass the number of alternatives (options.expN)')
     
     if options.expType == 'YesNo':
-        if ~(hasattr(options,'stepN')):
+        if not(hasattr(options,'stepN')):
             options.stepN = [40,40,20,20,20]
-        if ~(hasattr(options, 'mbStepN')):
+        if not(hasattr(options, 'mbStepN')):
             options.mbStepN = [25,20, 10,10,15]
     elif options.expType == 'nAFC' or options.expType == 'equalAsymptote':
-        if ~(hasattr(options,'stepN')):
+        if not(hasattr(options,'stepN')):
             options.stepN = [40,40,20,1,20]
-        if ~(hasattr(options, 'mbStepN')):
+        if not(hasattr(options, 'mbStepN')):
             options.mbStepN = [30,30,10,1,20]
     else:
         raise ValueError('You specified an illegal experiment type')
@@ -159,7 +159,7 @@ def psignifit(data, options):
         warnings.warn('psignifit:TresholdPCchanged\n'\
             'You changed the percent correct corresponding to the threshold\n')    
     
-    if ~hasattr(options, 'priors'):
+    if not(hasattr(options, 'priors')):
         options.priors = p.getStandardPriors(data, options)
     else:
         #TODO do I need to check for cell? 
@@ -180,7 +180,7 @@ def psignifit(data, options):
     '''        
     
     #warning if many blocks were measured
-    if (len(np.unique(data[:,0])) >= 25) and (np.ravel(options.stimulusRange) == 1):
+    if (len(np.unique(data[:,0])) >= 25) and (np.ravel(options.stimulusRange).size == 1):
         warnings.warn('psignifit:probablyAdaptive\n'\
             'The data you supplied contained >= 25 stimulus levels.\n'\
             'Did you sample adaptively?\n'\
@@ -189,7 +189,7 @@ def psignifit(data, options):
             'For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels,\n'\
             'which is frequently invalid for adaptive procedures!')
     
-    if all(data[:,2] <= 5) and (np.ravel(options.stimulusRange) == 1):
+    if all(data[:,2] <= 5) and (np.ravel(options.stimulusRange).size == 1):
         warnings.warn('psignifit:probablyAdaptive\n'\
             'All provided data blocks contain <= 5 trials \n'\
             'Did you sample adaptively?\n'\

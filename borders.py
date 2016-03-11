@@ -47,7 +47,7 @@ def setBorders(data,options):
         data[:,0] = np.log(data[:,0])
     
     # if range was not given take from data
-    if options.stimulusRange.size <= 1 :
+    if np.ravel(options.stimulusRange).size <= 1 :
         options.stimulusRange = np.array([min(data[:,0]), max(data[:,0])])
         stimRangeSet = False
     else:
