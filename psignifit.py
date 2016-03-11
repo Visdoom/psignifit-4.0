@@ -41,78 +41,78 @@ def psignifit(data, options):
         
     # options
         
-    if ~(options in locals()): 
+    if not('options' in locals()): 
         options = lambda:0
 
-    if ~(hasattr(options, 'sigmoidName')):
+    if not(hasattr(options, 'sigmoidName')):
         options.sigmoidName = 'norm'
     
-    if ~(hasattr(options, 'expType')):
+    if not(hasattr(options, 'expType')):
         options.expType = 'YesNo'
 
-    if ~(hasattr(options, 'estimateType')):
+    if not(hasattr(options, 'estimateType')):
         options.estimateType = 'MAP'
 
-    if ~(hasattr(options, 'confP')):
+    if not(hasattr(options, 'confP')):
         options.confP = [.95, .9, .68]
         
-    if ~(hasattr(options, 'instantPlot')):
+    if not(hasattr(options, 'instantPlot')):
         options.instantPlot = 0
         
-    if ~(hasattr(options, 'setBordersType')):
+    if not(hasattr(options, 'setBordersType')):
         options.setBordersType = 0
         
-    if ~(hasattr(options, 'maxBorderValue')):
+    if not(hasattr(options, 'maxBorderValue')):
         options.maxBorderValue = .00001
         
-    if ~(hasattr(options, 'moveBorders')):
+    if not(hasattr(options, 'moveBorders')):
         options.moveBorders = 1
         
-    if ~(hasattr(options, 'dynamicGrid')):
+    if not(hasattr(options, 'dynamicGrid')):
         options.dynamicGrid = 0
         
-    if ~(hasattr(options, 'widthalpha')):
+    if not(hasattr(options, 'widthalpha')):
         options.widthalpha = .05
         
-    if ~(hasattr(options, 'threshPC')):
+    if not(hasattr(options, 'threshPC')):
         options.threshPC = .5
 
-    if ~(hasattr(options, 'CImethod')):
+    if not(hasattr(options, 'CImethod')):
         options.CImethod = 'percentiles'
 
-    if ~(hasattr(options, 'gridSetType')):
+    if not(hasattr(options, 'gridSetType')):
         options.gridSetType = 'cumDist'
         
-    if ~(hasattr(options, 'fixedPars')):
+    if not(hasattr(options, 'fixedPars')):
         a = np.empty((5,1))
         a[:] = np.NaN
         options.fixedPars = a
         
-    if ~(hasattr(options, 'nblocks')):
+    if not(hasattr(options, 'nblocks')):
         options.nblocks = 25
     
-    if ~(hasattr(options, 'useGPU')):
+    if not(hasattr(options, 'useGPU')):
         options.useGPU = 0
     
-    if ~(hasattr(options, 'poolMaxGap')):
+    if not(hasattr(options, 'poolMaxGap')):
         options.poolMaxGap = np.inf
     
-    if ~(hasattr(options, 'poolMaxLength')):
+    if not(hasattr(options, 'poolMaxLength')):
         options.poolMaxLength = np.inf
     
-    if ~(hasattr(options, 'poolxTol')):
+    if not(hasattr(options, 'poolxTol')):
         options.poolxTol = 0
     
-    if ~(hasattr(options, 'betaPrior')):
+    if not(hasattr(options, 'betaPrior')):
         options.betaPrior = 10
     
-    if ~(hasattr(options, 'verbose')):
+    if not(hasattr(options, 'verbose')):
         options.verbose = 0
         
-    if ~(hasattr(options, 'stimulusRange')):
+    if not(hasattr(options, 'stimulusRange')):
         options.stimulusRange = 0
         
-    if ~(hasattr(options, 'fastOptim')):
+    if not(hasattr(options, 'fastOptim')):
         options.fastOptim = False
         
 

@@ -51,6 +51,7 @@ options.maxBorderValue = 1.000000000000000e-05
 options.moveBorders = 1    
 options.dynamicGrid = 0
 options.widthalpha  = 0.05 
+options.threshPC    = 0.5
 options.CImethod    = 'percentiles'
 options.gridSetType = 'cumDist'
 options.nblocks     = 25
@@ -69,8 +70,6 @@ options.sigmoidHandle = getSigmoidHandle(options)
 
 temp_data= importer.loadmat('variables.mat', struct_as_record=True,matlab_compatible=True)
 temp_options = importer.loadmat('options.mat', struct_as_record=False, squeeze_me=True)
-
-
 
 
 
