@@ -19,7 +19,6 @@ def getSigmoidHandle(options):
     where psi^(-1) is the inverse of the sigmoid function.
     '''
     
-    # TODO isstruct check 
     if hasattr(options, 'widthalpha'):
         options.widthalpha = .05
     

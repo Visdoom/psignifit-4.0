@@ -82,14 +82,13 @@ def logLikelihood(data,options, **kwargs):
             varscale = options.fixedPars[4]
             
     #issues for automization: limit range for lambda & gamma
-            #TODO check!
-    lamb[lamb < 0 | lamb > (1-np.max(gamma))] = np.nan
-    gamma[gamma < 0 | gamma > (1-np.max(lamb))] = np.nan
-    varscale[varscale < 0 | varscale > 1] = np.nan
     
-    varscaleOrig = np.reshape(varscale, 1,1,1,1,[]);
+    lamb[np.logical_or(lamb < 0 ,lamb > (1-np.max(gamma)))] = np.nan
+    gamma[np.logical_or(gamma < 0, gamma > (1-np.max(lamb)))] = np.nan
+    varscale[np.logical_or(varscale < 0, varscale > 1)] = np.nan
     
-    useGPU = (options.useGPU and ~oneParameter)
+    varscaleOrig = np.reshape(varscale, [1,1,1,1,-1]);
+
     
     if oneParameter:
         if options.expType == 'equalAsymptote':
@@ -116,17 +115,17 @@ def logLikelihood(data,options, **kwargs):
             p = - np.inf
     else:       # for grid evaluation
         
-        alpha = np.reshape(alpha, [],1)
-        beta = np.reshape(beta, 1, [])
-        lamb = np.reshape(lamb, 1,1,[])
-        gamma = np.reshape(gamma, 1,1,1,[])
-        varscale = np.reshape(varscale,1,1,1,1,[])
+        alpha = np.reshape(alpha, -1,1)
+        beta = np.reshape(beta, [1, -1])
+        lamb = np.reshape(lamb, [1,1,-1])
+        gamma = np.reshape(gamma, [1,1,1,-1])
+        varscale = np.reshape(varscale,[1,1,1,1,-1])
         varscale = varscale**2          # go from sd to variance
         vbinom = (varscale < 10**-9)    # for variance is smaller than we assume use the binomial model
         
         v = varscale[~vbinom]
         v = 1/v -1
-        v = np.reshape(v, 1,1,1,1, [])
+        v = np.reshape(v, [1,1,1,1, -1])
         p = 0                           # posterior
         pbin = 0                        # posterior for binomial work
         n = np.size(data,0)
@@ -142,7 +141,7 @@ def logLikelihood(data,options, **kwargs):
             if options.verbose > 3: 
                 print('\r%d/%d', i,n)
             xi = levels[i]
-            psi = sigmoidHandle(xi,alpha,beta) #TODO
+            psi = sigmoidHandle(xi,alpha,beta.ravel()) #TODO
             psi = psi*scale + gamma
             
             ni = np.array(data[i,2])
