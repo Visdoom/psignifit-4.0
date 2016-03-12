@@ -30,7 +30,7 @@ from marginalize import marginalize
 def psignifitCore(data, options):
     
     d = len(options.borders)
-    result = lambda:0
+    result = {}
     
     '''Choose grid dynamically from data'''
     if options.dynamicGrid:
@@ -45,48 +45,48 @@ def psignifitCore(data, options):
             calcSeed = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], 1/options.expN, X[3])
             Seed = scipy.optimize.fmin(func=calcSeed, x0 = [Seed[0:2], Seed[4]])
             Seed = [Seed[0:2], 1/options.expN, Seed[3]] #ToDo check whether row or colum vector
-        result.X1D = gridSetting(data,options, Seed) 
+        result['X1D'] = gridSetting(data,options, Seed) 
     
     
     else: # for types which do not need a MAP estimate
         if (options.gridSetType == 'priorlike' or options.gridSetType == 'STD'
             or options.gridSetType == 'exp' or options.gridSetType == '4power'):
-                result.X1D = gridSetting(data,options) 
+                result['X1D'] = gridSetting(data,options) 
         else: # Use a linear grid
             for idx in range[0:d]:
                 # If there is an actual Interval
                 if options.borders[idx, 0] < options.borders[idx,1]: 
                     #result.X1D[id] = linspace(bla)
-                    result.X1D[idx] = np.linspace(options.borders[idx,1], options.borders[idx,2],
+                    result['X1D'][idx] = np.linspace(options.borders[idx,1], options.borders[idx,2],
                                     num=options.stepN[idx])
                 # if parameter was fixed
                 else:
-                    result.X1D[idx] = options.borders[idx,0]
+                    result['X1D'][idx] = options.borders[idx,0]
                     
     '''Evaluate likelihood and form it into a posterior'''
     
-    [result.Posterior, result.logPmax] = l.likelihood(data, options, result.X1D[:])
-    result.weight = getWeights(result.X1D)
-    integral = np.sum(np.array(result.Posterior[:])*np.array(result.weight[:]))
-    result.Posterior = result.Posterior/integral
-    result.integral = integral
+    (result['Posterior'], result['logPmax']) = l.likelihood(data, options, result['X1D'][:])
+    result['weight'] = getWeights(result['X1D'])
+    integral = np.sum(np.array(result['Posterior'][:])*np.array(result['weight'][:]))
+    result['Posterior'] = result['Posterior']/integral
+    result['integral'] = integral
     
     '''Compute marginal distributions'''
     
     for idx in range[0,d]:
-        [result.marginals[idx], result.marginalsX[idx], result.marginalsW[idx]] = marginalize(result, id)
+        result['marginals'][idx], result['marginalsX'][idx], result['marginalsW'][idx] = marginalize(result, idx)
         
     '''Find point estimate'''
     if (options.estimateType == 'MAP' or options.estimateType == 'MLE'):
         # get MLE estimate
     
         #start at most likely grid point
-        (_, idx) = max(result.Posterior[:])
+        (_, idx) = max(result['Posterior'][:])
       
-        index = np.unravel_index(idx, result.Posterior.shape)
+        index = np.unravel_index(idx, result['Posterior'].shape)
         Fit = np.zeros([d,1])
         for idx in range[0:d]:
-            Fit[idx] = result.X1D[idx](index[idx]) #ToDo the round braces?
+            Fit[idx] = result['X1D'][idx](index[idx]) #TODO the round braces?
         
         if options.expType == 'YesNo':
             fun = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
@@ -105,7 +105,7 @@ def psignifitCore(data, options):
             raise ValueError('unknown expType')
             
         if options.fastOptim:
-            #todo check if dictionary works
+            #TODO check if dictionary works
             optimiseOptions = {'xtol':0, 'ftol':0, 'maxiter': 100, 'maxfun': 100}
             # or maybe optimiseOptions = (0,0,100,100)
             warnings.warn('changed options for optimization')
@@ -113,34 +113,35 @@ def psignifitCore(data, options):
             optimiseOptions = {'disp':False}
             #or maybe optimiseOptions = (_,_,_,_,_,False)
         
-        Fit =scipy.optimize.fmin(fun, x0, optimiseOptions) #ToDo check if that works this way         
+        Fit =scipy.optimize.fmin(fun, x0, optimiseOptions) #TODO check if that works this way         
         
         if options.expType == 'YesNo':
-            result.Fit = copy.deepcopy(Fit)
+            result['Fit'] = copy.deepcopy(Fit)
         elif options.expType == 'nAFC': #TODO is this row or column vectors?
-            result.Fit = np.transpose([Fit[0:2], 1/options.expN, Fit[3]])
+            result['Fit'] = np.transpose([Fit[0:2], 1/options.expN, Fit[3]])
         elif options.expType =='equalAsymptote':
-            result.Fit = np.transpose([Fit[0:2], Fit[2], Fit[3]])
+            result['Fit'] = np.transpose([Fit[0:2], Fit[2], Fit[3]])
         else:
             raise ValueError('unknown expType')
     
-    #TODO result.Fit[~np.isnan(options.fixedPars)] = options.fixedPars[~np.isnan(options.fixedPars)]
+        par_idx = np.where(np.isnan(options.fixedPars) == False)
+        result['Fit'][par_idx] = options.fixedPars[par_idx] #TODO check
             
     elif options.estimateType == 'mean':
         # get mean estimate
         Fit = np.zeros([d,1])
         for idx in range[0:d]:
-            Fit[idx] = np.sum(np.array(result.marginals[idx])*np.array(result.marginalsW[idx])*np.array(result.marginalsX[idx]))
+            Fit[idx] = np.sum(result['marginals'][idx]*result['marginalsW'][idx]*result['marginalsX'][idx])
         
-        result.Fit = copy.deepcopy(Fit)
+        result['Fit'] = copy.deepcopy(Fit)
         Fit = np.empty(Fit.shape)
     '''Include input into result'''
-    result.options = options # no copies here, because they are not changing
-    result.data = data
+    result['options'] = options # no copies here, because they are not changing
+    result['data'] = data
     
     '''Compute confidence intervals'''
     if ~options.fastOptim:
-        result.conf_Intervals = getConfRegion(result)
+        result['conf_Intervals'] = getConfRegion(result)
         
     return result
         

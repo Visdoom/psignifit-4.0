@@ -2,7 +2,7 @@
 import numpy as np
 import scipy.special as sp
 
-def likelihood(data, options, alpha, beta, l, gamma, varscale):
+def likelihood(data, options, **kwargs):
     """
     calculates the (normalized) likelihood for the data from given parameters
     function [p,logPmax] = likelihood(typeHandle,data,alpha,beta,lambda,gamma)
@@ -13,7 +13,7 @@ def likelihood(data, options, alpha, beta, l, gamma, varscale):
 
     """
     
-    p = logLikelihood(data, options, alpha, beta, l, gamma, varscale)
+    p = logLikelihood(data, options, **kwargs)
         
     '''We never need the actual value of the likelihood. Something proportional
     is enough and this circumvents numerical problems for the likelihood to
@@ -27,7 +27,7 @@ def likelihood(data, options, alpha, beta, l, gamma, varscale):
     return (p,logPmax)
 
 
-def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
+def logLikelihood(data,options, **kwargs):
     """
     Created on Mon Nov 30 22:19:05 2015
     the core function to evaluate the logLikelihood of the data
@@ -44,16 +44,26 @@ def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
     
     sigmoidHandle = options.sigmoidHandle
     
-    if (not(alpha in locals()) or not(alpha)): #TODO check how alpha looks if empty
+    if (not('alpha' in kwargs.keys())): #TODO check how alpha looks if empty
         raise ValueError('not enough input parameters')
-    if (not(beta in locals()) or not(beta)):
+    else:
+        alpha = kwargs['alpha']
+    if (not('beta' in kwargs.keys())):
         raise ValueError('not enough input parameters')
-    if (not(lamb in locals()) or not(lamb)):
+    else:
+        beta = kwargs['beta']
+    if (not('lambda' in kwargs.keys()) or kwargs['lambda'] == None):
         lamb = 0
-    if (not(gamma in locals()) or not(gamma)):
+    else:
+        lamb = kwargs['lambda']
+    if (not('gamma' in kwargs.keys()) or kwargs['gamma'] == None):
         gamma = .5
-    if (not(varscale in locals()) or not(varscale)):
+    else:
+        gamma = kwargs['gamma']
+    if (not('varscale' in kwargs.keys()) or kwargs['varscale'] == None):
         varscale = 1
+    else:
+        varscale = kwargs['varscale']
     
     # is the input only one point?
     oneParameter = not(len(alpha) > 1 or len(beta) > 1 or len(lamb) > 1 
@@ -122,14 +132,7 @@ def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
         n = np.size(data,0)
         levels = np.array(data[:,0])    # needed for GPU work
         
-        if useGPU:
-            gamma = gamma
-            lamb = lamb
-            v = v
-            data = data
-            p = p
-            pbin = pbin
-            # TODO create GPU array
+    
         
         if options.expType == 'equalAsymptote':
             gamma = lamb
@@ -141,14 +144,13 @@ def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
             xi = levels[i]
             psi = sigmoidHandle(xi,alpha,beta) #TODO
             psi = psi*scale + gamma
-            if useGPU:
-                psi = psi # TODO gpuArray
+            
             ni = np.array(data[i,2])
             ki = np.array(data[i,1])
             
             if ((ni-ki)>0 and ki > 0):
                 pbin = pbin + ki * np.log(psi) + (ni-ki)*np.log(1-psi)
-                if ~np.empty(v):
+                if not(np.empty(v)):
                     a = psi * v
                     b = (1-psi)*v
                     p = p + sp.gammaln(ki+a) + sp.gammaln(ni-ki+b)
@@ -158,7 +160,7 @@ def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
                     p = np.array([])
             elif ki > 0:    # --> ni-ki == 0
                 pbin  = pbin + ki * np.log(psi);
-                if ~np.empty(v):                                             
+                if not(np.empty(v)):                                             
                     a = psi*v
                     p = p + sp.gammaln(ki + a)
                     p = p - sp.gammaln(ni+v)
@@ -169,7 +171,7 @@ def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
             
             elif (ni-ki) > 0 :  # --> ki ==0
                 pbin = pbin  + (ni-ki)*np.log(1-psi)
-                if ~np.empty(v):
+                if not(np.empty(v)):
                     b = (1-psi)*v
                     p = p + sp.gammaln(ni-ki+b)
                     p = p - sp.gammaln(ni+v) - sp.gammaln(b)
@@ -181,17 +183,9 @@ def logLikelihood(data,options, alpha, beta, lamb, gamma, varscale ):
             print('\n')
         
         p = np.concatenate(5,np.matlib.repmat(pbin, [1,1,1,1,sum(vbinom)]),p)
-        if useGPU:
-            # TODO gather data from GPU
-            p = p
-            lamb = lamb
-            gamma = gamma
-            alpha = alpha
-            beta = beta
-        
         p[np.isnan(p)] = -np.inf
 
-    if ~np.empty(options.priors):
+    if not(np.empty(options.priors)):
         if isinstance(options.priors, list):
             if hasattr(options.priors[0], '__call__'):
                 p = p + np.log(options.priors[0](alpha))

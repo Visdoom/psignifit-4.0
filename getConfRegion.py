@@ -20,22 +20,22 @@ confidence levels. (any shape of confP will be interpreted as a vector)
 
 """
 import numpy as np
-
+from marginalize import marginalize 
 def getConfRegion(result, nargout):
     
-    mode = result.options.CImethod
-    d = len(result.X1D)
+    mode = result['options'].CImethod
+    d = len(result['X1D'])
     
     ''' get confidence intervals for each parameter --> marginalize'''
-    conf_Intervals = np.zeros(d,2, len(result.options.confP))
+    conf_Intervals = np.zeros(d,2, len(result['options'].confP))
     i = 0
-    for iConfP in result.options.confP:
+    for iConfP in result['options'].confP:
         if nargout> 1 or mode == 'project':
-            order = np.array(result.Posterior[:]).argsort()[::-1]
-            Mass = result.Posterior*result.weight
+            order = np.array(result['Posterior'][:]).argsort()[::-1]
+            Mass = result['Posterior']*result['weight']
             Mass = np.cumsum(Mass[order])
             
-            confRegion = np.reshape(np.array([True]*np.size(result.Posterior),np.shape(result.Posterior)))            
+            confRegion = np.reshape(np.array([True]*np.size(result['Posterior']),result['Posterior'].shape))            
             confRegion[order[Mass >= iConfP]] = False             
     
         if mode == 'project':
@@ -44,8 +44,8 @@ def getConfRegion(result, nargout):
                 for idx2 in range(0,d):
                     if idx != idx2:
                         confRegionM = np.any(confRegionM,idx2)
-                start = result.X1D[idx].flatten().nonzero()[0][0]  
-                stop = result.X1D[idx].flatten().nonzero()[0][-1]
+                start = result['X1D'][idx].flatten().nonzero()[0][0]  
+                stop = result['X1D'][idx].flatten().nonzero()[0][-1]
                 conf_Intervals[idx,:,i] = [start,stop]
         elif mode == 'stripes':
             for idx in range(0,d):
