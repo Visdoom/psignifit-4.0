@@ -41,7 +41,7 @@ def setBorders(data,options):
         gammaB = np.array([np.nan, np.nan])
     
     # varscale from 0 to 1, 1 excluded!
-    varscaleB = np.array(0, 1-np.exp(-20))  
+    varscaleB = np.array([0, 1-np.exp(-20)])  
     
     if options.logspace:
         data[:,0] = np.log(data[:,0])
@@ -99,7 +99,8 @@ def moveBorders(data,options):
     tol = options.maxBorderValue
     d = options.borders.shape[0]
     
-    MBresult =  lambda: 0
+    MBresult = {'X1D':[]}
+    
     
     ''' move borders out
     should our borders be to tight, e.g. the distribution does not go to zero
@@ -113,18 +114,18 @@ def moveBorders(data,options):
     for idx in range(0,d):
         if (len(options.mbStepN) >= idx and options.mbStepN[idx] >= 2 
             and options.borders[idx,0] != options.borders[idx,1]) :
-            MBresult.X1D[idx] = np.linspace(options.borders[idx,0], options.borders[idx,1], options.mbStepN[idx])
+            MBresult['X1D'].append(np.linspace(options.borders[idx,0], options.borders[idx,1], options.mbStepN[idx]))
         else:
             if (options.borders[idx,0] != options.borders[idx,1] and options.expType != 'equalAsymptote'):
                 warnings.warn('MoveBorders: You set only one evaluation for moving the borders!') 
             
-            MBresult.X1D[idx] = 0.5*np.sum(options.borders[idx])            
+            MBresult['X1D'].append( 0.5*np.sum(options.borders[idx]))        
            
         
-    MBresult.weight = getWeights(MBresult.X1D)
-    MBresult.Posterior = likelihood(data, options, MBresult.X1D) # TODO check!
-    integral = sum(MBresult.Posterior[:] * MBresult.weight[:])
-    MBresult.Posterior /= integral
+    MBresult['weight'] = getWeights(MBresult['X1D'])
+    MBresult['Posterior'] = likelihood(data, options, MBresult['X1D']) # TODO check!
+    integral = sum(MBresult['Posterior'][:] * MBresult['weight'][:])
+    MBresult['Posterior'] /= integral
 
     borders = np.zeros([d,2])    
     

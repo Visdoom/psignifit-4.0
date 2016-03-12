@@ -136,8 +136,8 @@ def psignifit(data, options):
     else:
         raise ValueError('You specified an illegal experiment type')
     
-    #assert(max(data[:,0]) > min(data[:,0]),  TODO check if that is really meant this way
-    #'Your data does not have variance on the x-axis! This makes fitting impossible')
+    assert((max(data[:,0]) - min(data[:,0]) > 0),   
+           'Your data does not have variance on the x-axis! This makes fitting impossible')
                  
                      
     '''
@@ -162,7 +162,7 @@ def psignifit(data, options):
     if not(hasattr(options, 'priors')):
         options.priors = p.getStandardPriors(data, options)
     else:
-        #TODO do I need to check for cell? 
+        
         priors = p.getStandardPriors(data, options)
         
         for ipar in range(5):
@@ -216,8 +216,13 @@ def psignifit(data, options):
         options.borders[np.isnan(options.borders)] = borders[np.isnan(options.borders)]
     else:
         options.borders = b.setBorders(data,options)
-    options.borders[np.logical_not(np.isnan(options.fixedPars)),0] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]
-    options.borders[np.logical_not(np.isnan(options.fixedPars)),1] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]        
+    
+    border_idx = np.where(np.isnan(options.fixedPars) == False);
+    
+    options.borders[border_idx[0]] = options.fixedPars[border_idx[0]]
+    options.borders[border_idx[1]] = options.fixedPars[border_idx[1]]
+    #options.borders[np.logical_not(np.isnan(options.fixedPars)),0] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]
+    #options.borders[np.logical_not(np.isnan(options.fixedPars)),1] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]        
             
     # normalize priors to first hoice of borders
     options.priors = p.normalizePriors(options)

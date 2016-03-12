@@ -13,15 +13,16 @@ from utils import my_betapdf, my_norminv
 
 def prior1(x, xspread, stimRange):
     
-    r = (x >= (stimRange[0]-.5*xspread))*(x<=stimRange[0])*(.5+.5*np.cos(2*np.pi*(stimRange[0]-x)/xspread)) 
-    + (x>stimRange[0])*(x<stimRange[1]) + (x>=stimRange[1])*(x<=stimRange[1]+.5*xspread)*(.5+.5*np.cos(2*np.pi*(x-stimRange[1])/xspread))
+    r = (x >= (stimRange[0]-.5*xspread))*(x<=stimRange[0])*(.5+.5*np.cos(2*np.pi*(stimRange[0]-x)/xspread)) \
+        + (x>stimRange[0])*(x<stimRange[1]) + (x>=stimRange[1])*(x<=stimRange[1]+.5*xspread)*(.5+.5*np.cos(2*np.pi*(x-stimRange[1])/xspread))
+        
     return r
 
 def prior2(x, Cfactor, wmin, wmax):
     
-    r = ((x*Cfactor)>=wmin)*((x*Cfactor)<=2*wmin)*(.5-.5*np.cos(np.pi*((x*Cfactor)-wmin)/wmin))
-    + ((x*Cfactor)>2*wmin)*((x*Cfactor)<wmax)
-    + ((x*Cfactor)>=wmax)*((x*Cfactor)<=3*wmax)*(.5+.5*np.cos(np.pi/2*(((x*Cfactor)-wmax)/wmax)))
+    r = ((x*Cfactor)>=wmin)*((x*Cfactor)<=2*wmin)*(.5-.5*np.cos(np.pi*((x*Cfactor)-wmin)/wmin)) \
+        + ((x*Cfactor)>2*wmin)*((x*Cfactor)<wmax) \
+        + ((x*Cfactor)>=wmax)*((x*Cfactor)<=3*wmax)*(.5+.5*np.cos(np.pi/2*(((x*Cfactor)-wmax)/wmax)))
 
     return r
     
@@ -175,16 +176,16 @@ def normalizePriors(options):
     
     priors = []
     for idx in range(0,len(options.priors)):
-        if options.borders[idx,1] > options.borders[idx,0]:
+        if options.borders[idx][1] > options.borders[idx][0]:
             #choose xValues for calculation of the integral
-            x = np.linspace(options.borders[idx,0], options.borders[idx,1], 1000)
+            x = np.linspace(options.borders[idx][0], options.borders[idx][1], 1000)
             # evaluate unnormalized prior
             y = options.priors[idx](x)
             w = np.convolve(np.diff(x), np.array([.5,.5]))
             integral = sum(y[:]*w[:])
-            priors[idx] = lambda x: options.priors[idx] / integral
+            priors.append(lambda x: options.priors[idx] / integral)
         else:
-            priors[idx] = lambda x: 1
+            priors.append(lambda x: 1)
     
     return priors
 

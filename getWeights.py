@@ -16,22 +16,26 @@ def getWeights(X1D):
     ''' puts the X values in their respective dimensions to use bsxfun for
     evaluation'''
     Xreshape = []
-    Xreshape.append(reshape(X1D[0], [], 1))
+    Xreshape.append(X1D[0].reshape(-1,1))
     if d >= 2:
-        Xreshape.append(reshape(X1D[1], 1,[]))
+        Xreshape.append(X1D[1].reshape([1,-1]))
     
     for idx in range (2,d):
-        Xreshape.append(reshape(X1D[idx], [ones(1,idx-1), len(X1D[idx])]))
+        dims = [1]*idx
+        dims.append(-1)
+        Xreshape.append(reshape(X1D[idx], dims))
+    
     
     # to find and handle singleton dimensions
-    Xlength = array([len(X1D[i]) for i in range(0,d)])
+    sizes = [X1D[ix].size for ix in range(0,d)]
+    Xlength = array(sizes)
     
     ''' calculate weights '''
     #1) calculate mass/volume for each cuboid
     weight = 1
     for idx in range(0,d):
         if Xlength[idx] > 1:
-            weight = weight*diff(Xreshape[idx]) # TODO check
+            weight = weight*diff(Xreshape[idx], axis=idx) # TODO check
     
     #2) sum to get weight for each point
     if d > 1:

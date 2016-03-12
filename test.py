@@ -11,7 +11,7 @@ import scipy.io as importer
 import psignifit as ps
 from getSigmoidHandle import getSigmoidHandle 
 import priors as p
-from utils import my_betapdf
+#from utils import my_betapdf
 
 
 data = np.array([
@@ -62,8 +62,10 @@ options.mbStepN     = np.array([30,40,10,1,20])
 options.logspace    = 0
 options.priors      = p.getStandardPriors(data,options)
 
-x = np.linspace(0.001,.9,25)
-my_betapdf(x,1,10)
+x = np.linspace(-0.0035,0.0145,1000)
+#xspread= 0.0090000000000000011
+#stimRange = np.array([0.001,0.01])
+#p.prior1(x,xspread,stimRange)
 p.checkPriors(data,options)
 #options.borders
 options.sigmoidHandle = getSigmoidHandle(options)

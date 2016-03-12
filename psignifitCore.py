@@ -82,7 +82,7 @@ def psignifitCore(data, options):
     
         #start at most likely grid point
         (_, idx) = max(result.Posterior[:])
-        #index = cell(d,1)  #ToDo
+      
         index = np.unravel_index(idx, result.Posterior.shape)
         Fit = np.zeros([d,1])
         for idx in range[0:d]:

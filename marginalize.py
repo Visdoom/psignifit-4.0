@@ -17,31 +17,30 @@ of the grid.
 import numpy as np
 def marginalize(result, dimension):
         
-      #TODO
-      #assert(isinstance(dimension, (numpy.int64, int)), 'the dimension you want to marginalize to should be given as a vector of number 0:4')
+      #
       assert(dimension.all() in range(0,5), 'the dimensions you want to marginalize to  should be given as a vector of numbers 0 to 4')
         
-      d = len(result.X1D)
+      d = len(result['X1D'])
         
-      if len(dimension) == 1 and hasattr(result, 'marginals') and len(result.marginals) >= dimension:
-          marginal = result.marginals[dimension]
-          weight = result.marginalsW[dimension]
-          x = result.marginalsX[dimension]
+      if len(dimension) == 1 and ('marginals' in result.keys()) and len(result['marginals']) >= dimension:
+          marginal = result['marginals'][dimension]
+          weight = result['marginalsW'][dimension]
+          x = result['marginalsX'][dimension]
       else:
-          if ~(hasattr(result, 'Posterior')):
+          if not('Posterior' in result.keys()):
               raise ValueError('marginals cannot be computed anymore because posterior was dropped')
           else:
-              assert(np.shape(result.Posterior) == np.shape(result.weight), 'dimensions mismatch in marginalization')
+              assert(np.shape(result['Posterior']) == np.shape(result['weight']), 'dimensions mismatch in marginalization')
                 
               if len(dimension) == 1:
-                  x = result.X1D[dimension][:]
+                  x = result['X1D'][dimension][:]
               else:
                   x = np.nan
               
               # calculate mass at each grid point
-              marginal = result.weight*result.Posterior
+              marginal = result['weight']*result['Posterior']
                 
-              weight = result.weight
+              weight = result['weight']
                
               for i in range(0,d):
                   if not(any(i == dimension)) and marginal.shape[i] > 1:
@@ -56,7 +55,7 @@ def marginalize(result, dimension):
               else:
                   marginal = np.array(marginal)
                   weight = np.array(weight)
-                  x = result.X1D[np.sort(dimension)]
+                  x = result['X1D'][np.sort(dimension)] #TODO why the sort here?
                 
       return (marginal, x, weight)
 
