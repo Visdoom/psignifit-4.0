@@ -115,10 +115,10 @@ def logLikelihood(data,options, **kwargs):
             p = - np.inf
     else:       # for grid evaluation
         
-        alpha = np.reshape(alpha, -1,1)
-        beta = np.reshape(beta, [1, -1])
-        lamb = np.reshape(lamb, [1,1,-1])
-        gamma = np.reshape(gamma, [1,1,1,-1])
+        alpha = np.reshape(alpha, [-1,1,1,1,1])
+        beta = np.reshape(beta, [1, -1, 1, 1,1])
+        lamb = np.reshape(lamb, [1,1,-1, 1, 1])
+        gamma = np.reshape(gamma, [1,1,1,-1, 1])
         varscale = np.reshape(varscale,[1,1,1,1,-1])
         varscale = varscale**2          # go from sd to variance
         vbinom = (varscale < 10**-9)    # for variance is smaller than we assume use the binomial model
@@ -141,9 +141,9 @@ def logLikelihood(data,options, **kwargs):
             if options['verbose'] > 3: 
                 print('\r%d/%d', i,n)
             xi = levels[i]
-            psi = sigmoidHandle(xi,alpha[...,np.newaxis],beta) 
-            psi = psi[...,np.newaxis, np.newaxis]*scale + gamma
-            psi = psi[..., np.newaxis]
+            psi = sigmoidHandle(xi,alpha,beta) 
+            psi = psi*scale + gamma
+            psi = psi
             ni = np.array(data[i,2])
             ki = np.array(data[i,1])
             
@@ -187,7 +187,7 @@ def logLikelihood(data,options, **kwargs):
     if (options['priors']):
         if isinstance(options['priors'], list):
             if hasattr(options['priors'][0], '__call__'):
-                p = p + np.log(options['priors'][0](alpha))
+                p = np.log(options['priors'][0](alpha)) + p
             if hasattr(options['priors'][1], '__call__'):
                 p = p + np.log(options['priors'][1](beta))
             if hasattr(options['priors'][2], '__call__'):
@@ -196,7 +196,8 @@ def logLikelihood(data,options, **kwargs):
                 p = p + np.log(options['priors'][3](gamma))
             if hasattr(options['priors'][4], '__call__'):
                 p = p + np.log(options['priors'][4](varscaleOrig))
-                
+    
+
     return p  
 
         

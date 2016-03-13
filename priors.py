@@ -183,7 +183,8 @@ def normalizePriors(options):
             y = options['priors'][idx](x)
             w = np.convolve(np.diff(x), np.array([.5,.5]))
             integral = sum(y[:]*w[:])
-            priors.append(lambda x: options['priors'][idx] / integral)
+            func = options['priors'][idx]
+            priors.append(lambda x: func(x)/ integral)
         else:
             priors.append(lambda x: 1)
     
