@@ -33,27 +33,27 @@ def setBorders(data,options):
     # lapse fix to 0 - .5    
     lapseB = np.array([0,.5])
     
-    if options.expType == 'nAFC':
-        gammaB = np.array([1/options.expN, 1/options.expN])
-    elif options.expType == 'YesNo':
+    if options['expType'] == 'nAFC':
+        gammaB = np.array([1/options['expN'], 1/options['expN']])
+    elif options['expType'] == 'YesNo':
         gammaB = np.array([0, .5])
-    elif options.expType == 'equalAsymptote':
+    elif options['expType'] == 'equalAsymptote':
         gammaB = np.array([np.nan, np.nan])
     
     # varscale from 0 to 1, 1 excluded!
     varscaleB = np.array([0, 1-np.exp(-20)])  
     
-    if options.logspace:
+    if options['logspace']:
         data[:,0] = np.log(data[:,0])
     
     # if range was not given take from data
-    if np.ravel(options.stimulusRange).size <= 1 :
-        options.stimulusRange = np.array([min(data[:,0]), max(data[:,0])])
+    if np.ravel(options['stimulusRange']).size <= 1 :
+        options['stimulusRange'] = np.array([min(data[:,0]), max(data[:,0])])
         stimRangeSet = False
     else:
         stimRangeSet= True
-        if options.logspace:
-            options.stimulusRange = np.log(options.stimulusRange)
+        if options['logspace']:
+            options['stimulusRange'] = np.log(options['stimulusRange'])
     
     '''
      We then assume it is one of the reparameterized functions with
@@ -61,8 +61,8 @@ def setBorders(data,options):
      The threshold is assumed to be within the range of the data +/-
      .5 times it's spread
     '''
-    dataspread = np.diff(options.stimulusRange)
-    alphaB = np.array([options.stimulusRange[0] - .5*dataspread, options.stimulusRange[1] +.5*dataspread])
+    dataspread = np.diff(options['stimulusRange'])
+    alphaB = np.array([options['stimulusRange'][0] - .5*dataspread, options['stimulusRange'][1] +.5*dataspread])
     
     ''' the width we assume to be between half the minimal distance of
     two points and 5 times the spread of the data '''
@@ -70,12 +70,12 @@ def setBorders(data,options):
     if len(np.unique(data[:,0])) > 1 and not(stimRangeSet):
         widthmin = np.min(np.diff(np.sort(np.unique(data[:,0]))))
     else :
-        widthmin = 100*np.spacing(options.stimulusRange[1])
+        widthmin = 100*np.spacing(options['stimulusRange'][1])
     
     ''' We use the same prior as we previously used... e.g. we use the factor by
     which they differ for the cumulative normal function '''
     
-    Cfactor = (my_norminv(.95,0,1) - my_norminv(.05, 0,1))/(my_norminv(1- options.widthalpha, 0,1) - my_norminv(options.widthalpha, 0,1))
+    Cfactor = (my_norminv(.95,0,1) - my_norminv(.05, 0,1))/(my_norminv(1- options['widthalpha'], 0,1) - my_norminv(options['widthalpha'], 0,1))
     betaB  = np.array([widthmin, 3/Cfactor*dataspread])
     
     borders =[[alphaB], [betaB], [lapseB], [gammaB], [varscaleB]]
@@ -96,8 +96,8 @@ def moveBorders(data,options):
     """
     borders = []
     
-    tol = options.maxBorderValue
-    d = options.borders.shape[0]
+    tol = options['maxBorderValue']
+    d = options['borders'].shape[0]
     
     MBresult = {'X1D':[]}
     
@@ -112,14 +112,14 @@ def moveBorders(data,options):
     ''' move borders inwards '''
     
     for idx in range(0,d):
-        if (len(options.mbStepN) >= idx and options.mbStepN[idx] >= 2 
-            and options.borders[idx,0] != options.borders[idx,1]) :
-            MBresult['X1D'].append(np.linspace(options.borders[idx,0], options.borders[idx,1], options.mbStepN[idx]))
+        if (len(options['mbStepN']) >= idx and options['mbStepN'][idx] >= 2 
+            and options['borders'][idx,0] != options['borders'][idx,1]) :
+            MBresult['X1D'].append(np.linspace(options['borders'][idx,0], options['borders'][idx,1], options['mbStepN'][idx]))
         else:
-            if (options.borders[idx,0] != options.borders[idx,1] and options.expType != 'equalAsymptote'):
+            if (options['borders'][idx,0] != options['borders'][idx,1] and options['expType'] != 'equalAsymptote'):
                 warnings.warn('MoveBorders: You set only one evaluation for moving the borders!') 
             
-            MBresult['X1D'].append( np.array([0.5*np.sum(options.borders[idx])]))        
+            MBresult['X1D'].append( np.array([0.5*np.sum(options['borders'][idx])]))        
            
         
     MBresult['weight'] = getWeights(MBresult['X1D'])

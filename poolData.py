@@ -18,9 +18,9 @@ def poolData(data,options):
     dataDim1 = data.shape[0]
     dataDim2 = data.shape[1]
     counted = tile(False,[len(data),1])     # which elements we already counted
-    gap = options.poolMaxGap                # max gap between two trials of a block
-    maxL = options.poolMaxLength            # maximal blocklength
-    xTol = options.poolxTol                 # maximal difference to elements pooled in a block
+    gap = options['poolMaxGap']                # max gap between two trials of a block
+    maxL = options['poolMaxLength']            # maximal blocklength
+    xTol = options['poolxTol']                 # maximal difference to elements pooled in a block
     cTrialN = array([[0],[cumsum(data[:,2])]]) # cumulated number of trials with leading 0
     
     if dataDim2 == 4:

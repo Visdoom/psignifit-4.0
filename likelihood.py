@@ -42,9 +42,9 @@ def logLikelihood(data,options, **kwargs):
     """
 
     
-    sigmoidHandle = options.sigmoidHandle
+    sigmoidHandle = options['sigmoidHandle']
     
-    if (not('alpha' in kwargs.keys())): #TODO check how alpha looks if empty
+    if (not('alpha' in kwargs.keys())): 
         raise ValueError('not enough input parameters')
     else:
         alpha = kwargs['alpha']
@@ -70,16 +70,16 @@ def logLikelihood(data,options, **kwargs):
                 or len(gamma) > 1 or len(varscale) > 1)
     
     if oneParameter:     # in optimization if the parameter supplied is not the fixed value
-        if np.isfinite(np.array(options.fixedPars[0])):
-            alpha = options.fixedPars[0]
-        if np.isfinite(np.array(options.fixedPars[1])):
-            beta = options.fixedPars[1]
-        if np.isfinite(np.array(options.fixedPars[2])):
-            lamb = options.fixedPars[2]
-        if np.isfinite(np.array(options.fixedPars[3])):
-            gamma = options.fixedPars[3]
-        if np.isfinite(np.array(options.fixedPars[4])):
-            varscale = options.fixedPars[4]
+        if np.isfinite(np.array(options['fixedPars'][0])):
+            alpha = options['fixedPars'][0]
+        if np.isfinite(np.array(options['fixedPars'][1])):
+            beta = options['fixedPars'][1]
+        if np.isfinite(np.array(options['fixedPars'][2])):
+            lamb = options['fixedPars'][2]
+        if np.isfinite(np.array(options['fixedPars'][3])):
+            gamma = options['fixedPars'][3]
+        if np.isfinite(np.array(options['fixedPars'][4])):
+            varscale = options['fixedPars'][4]
             
     #issues for automization: limit range for lambda & gamma
     
@@ -91,7 +91,7 @@ def logLikelihood(data,options, **kwargs):
 
     
     if oneParameter:
-        if options.expType == 'equalAsymptote':
+        if options['expType'] == 'equalAsymptote':
             gamma = lamb
         p = 0
         scale = 1-gamma -lamb
@@ -133,12 +133,12 @@ def logLikelihood(data,options, **kwargs):
         
     
         
-        if options.expType == 'equalAsymptote':
+        if options['expType'] == 'equalAsymptote':
             gamma = lamb
         
         scale = 1-gamma-lamb
         for i in range(0,n):
-            if options.verbose > 3: 
+            if options['verbose'] > 3: 
                 print('\r%d/%d', i,n)
             xi = levels[i]
             psi = sigmoidHandle(xi,alpha[...,np.newaxis],beta) 
@@ -178,24 +178,24 @@ def logLikelihood(data,options, **kwargs):
                 else:
                     p = np.array([])
         
-        if options.verbose > 3 :
+        if options['verbose'] > 3 :
             print('\n')
         
         p = np.concatenate((np.tile(pbin, [1,1,1,1,np.sum(vbinom)]),p), axis=4)
         p[np.isnan(p)] = -np.inf
 
-    if (options.priors):
-        if isinstance(options.priors, list):
-            if hasattr(options.priors[0], '__call__'):
-                p = p + np.log(options.priors[0](alpha))
-            if hasattr(options.priors[1], '__call__'):
-                p = p + np.log(options.priors[1](beta))
-            if hasattr(options.priors[2], '__call__'):
-                p = p + np.log(options.priors[2](lamb))
-            if hasattr(options.priors[3], '__call__'):
-                p = p + np.log(options.priors[3](gamma))
-            if hasattr(options.priors[4], '__call__'):
-                p = p + np.log(options.priors[4](varscaleOrig))
+    if (options['priors']):
+        if isinstance(options['priors'], list):
+            if hasattr(options['priors'][0], '__call__'):
+                p = p + np.log(options['priors'][0](alpha))
+            if hasattr(options['priors'][1], '__call__'):
+                p = p + np.log(options['priors'][1](beta))
+            if hasattr(options['priors'][2], '__call__'):
+                p = p + np.log(options['priors'][2](lamb))
+            if hasattr(options['priors'][3], '__call__'):
+                p = p + np.log(options['priors'][3](gamma))
+            if hasattr(options['priors'][4], '__call__'):
+                p = p + np.log(options['priors'][4](varscaleOrig))
                 
     return p  
 

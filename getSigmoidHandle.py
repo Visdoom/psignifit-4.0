@@ -20,11 +20,11 @@ def getSigmoidHandle(options):
     '''
     
     if hasattr(options, 'widthalpha'):
-        options.widthalpha = .05
+        options['widthalpha'] = .05
     
-    alpha = options.widthalpha
-    sigmoid = options.sigmoidName
-    PC = options.threshPC
+    alpha = options['widthalpha']
+    sigmoid = options['sigmoidName']
+    PC = options['threshPC']
     
     if isinstance(sigmoid,str):
         sig = sigmoid.lower()

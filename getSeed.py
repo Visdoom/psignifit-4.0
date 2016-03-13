@@ -17,8 +17,8 @@ import numpy as np
 def getSeed(data,options):
     
     ''' input parsing '''
-    alpha0 = options.widthalpha
-    if options.logspace:
+    alpha0 = options['widthalpha']
+    if options['logspace']:
         data[:,0] = np.log(data[:,0])
     
     x = np.array(data[:,0])

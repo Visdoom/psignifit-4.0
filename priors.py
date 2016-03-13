@@ -38,37 +38,37 @@ def getStandardPriors(data, options):
     priors = []    
     
     """ treat logspace sigmoids """
-    if options.logspace:
+    if options['logspace']:
         data[:,0] = np.log(data[:,0])
         
     ''' of range was not given take it from data '''
-    if np.ravel(options.stimulusRange).size <= 1:
-        options.stimulusRange = np.array([np.min(data[:,0]), np.max(data[:,0])])
+    if np.ravel(options['stimulusRange']).size <= 1:
+        options['stimulusRange'] = np.array([np.min(data[:,0]), np.max(data[:,0])])
         stimRangeSet = False
     else:
         stimRangeSet = True
-        if options.logspace:
-            options.stimulusRange = np.log(options.stimulusRange)
+        if options['logspace']:
+            options['stimulusRange'] = np.log(options['stimulusRange'])
     
     """ threshold """
-    xspread = options.stimulusRange[1]-options.stimulusRange[0]
+    xspread = options['stimulusRange'][1]-options['stimulusRange'][0]
     ''' we assume the threshold is in the range of the data, for larger or
         smaller values we tapre down to 0 with a raised cosine across half the
         dataspread '''
 
-    priors.append(lambda x: prior1(x,xspread,options.stimulusRange))
+    priors.append(lambda x: prior1(x,xspread,options['stimulusRange']))
     
     """width"""
     # minimum = minimal difference of two stimulus levels
     if len(np.unique(data[:,0])) >1 and not(stimRangeSet):
         widthmin = np.min(np.diff(np.sort(np.unique(data[:,0]))))
     else:
-        widthmin =100*np.spacing(options.stimulusRange[1])
+        widthmin =100*np.spacing(options['stimulusRange'][1])
     
     widthmax = xspread
     ''' We use the same prior as we previously used... e.g. we use the factor by
         which they differ for the cumulative normal function'''
-    Cfactor = (my_norminv(.95,0,1) - my_norminv(.05,0,1))/( my_norminv(1-options.widthalpha,0,1) - my_norminv(options.widthalpha,0,1))
+    Cfactor = (my_norminv(.95,0,1) - my_norminv(.05,0,1))/( my_norminv(1-options['widthalpha'],0,1) - my_norminv(options['widthalpha'],0,1))
     
     priors.append(lambda x: prior2(x,Cfactor, widthmin, widthmax))
     
@@ -81,7 +81,7 @@ def getStandardPriors(data, options):
     priors.append(lambda x: my_betapdf(x,1,10))
     
     """ sigma """
-    be = options.betaPrior
+    be = options['betaPrior']
     priors.append(lambda x: my_betapdf(x,1,be))
     
     return priors
@@ -104,7 +104,7 @@ def checkPriors(data,options):
     """
 
 
-    if options.logspace :
+    if options['logspace'] :
         data[:,0] = np.log(data[:,0])
     
     """ on threshold 
@@ -115,14 +115,14 @@ def checkPriors(data,options):
     dataspread = data_max - data_min
     testValues = np.linspace(data_min - .4*dataspread, data_max + .4*dataspread, 25)
     
-    testResult = options.priors[0](testValues)
+    testResult = options['priors'][0](testValues)
 
     testForWarnings(testResult, "the threshold")
     """ on width
     values according to standard priors
     """
     testValues = np.linspace(1.1*np.min(np.diff(np.sort(np.unique(data[:,0])))), 2.9*dataspread, 25)
-    testResult = options.priors[1](testValues)
+    testResult = options['priors'][1](testValues)
     
     testForWarnings(testResult, "the width")
     
@@ -130,7 +130,7 @@ def checkPriors(data,options):
     values 0 to .9
     """
     testValues = np.linspace(0.001,.9,25)
-    testResult = options.priors[2](testValues)
+    testResult = options['priors'][2](testValues)
     
     testForWarnings(testResult, "lambda")
     
@@ -138,7 +138,7 @@ def checkPriors(data,options):
     values 0 to .9
     """
     testValues = np.linspace(0.0001,.9,25)
-    testResult = options.priors[3](testValues)
+    testResult = options['priors'][3](testValues)
     
     testForWarnings(testResult, "gamma")
     
@@ -146,7 +146,7 @@ def checkPriors(data,options):
     values 0 to .9
     """
     testValues = np.linspace(0,.9,25)
-    testResult = options.priors[4](testValues)
+    testResult = options['priors'][4](testValues)
     
     testForWarnings(testResult, "eta")    
    
@@ -175,15 +175,15 @@ def normalizePriors(options):
     """
     
     priors = []
-    for idx in range(0,len(options.priors)):
-        if options.borders[idx][1] > options.borders[idx][0]:
+    for idx in range(0,len(options['priors'])):
+        if options['borders'][idx][1] > options['borders'][idx][0]:
             #choose xValues for calculation of the integral
-            x = np.linspace(options.borders[idx][0], options.borders[idx][1], 1000)
+            x = np.linspace(options['borders'][idx][0], options['borders'][idx][1], 1000)
             # evaluate unnormalized prior
-            y = options.priors[idx](x)
+            y = options['priors'][idx](x)
             w = np.convolve(np.diff(x), np.array([.5,.5]))
             integral = sum(y[:]*w[:])
-            priors.append(lambda x: options.priors[idx] / integral)
+            priors.append(lambda x: options['priors'][idx] / integral)
         else:
             priors.append(lambda x: 1)
     

@@ -29,39 +29,39 @@ from marginalize import marginalize
 
 def psignifitCore(data, options):
     
-    d = len(options.borders)
+    d = len(options['borders'])
     result = {}
     
     '''Choose grid dynamically from data'''
-    if options.dynamicGrid:
+    if options['dynamicGrid']:
         # get seed from linear regression with logit transform
         Seed = getSeed(data,options)
         
         # further optimize the logliklihood to obtain a good estimate of the MAP
-        if options.expType == 'YesNo':
+        if options['expType'] == 'YesNo':
             calcSeed = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
             Seed = scipy.optimize.fmin(func=calcSeed, x0 = Seed)
-        elif options.expType == 'nAFC':
-            calcSeed = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], 1/options.expN, X[3])
+        elif options['expType'] == 'nAFC':
+            calcSeed = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], 1/options['expN'], X[3])
             Seed = scipy.optimize.fmin(func=calcSeed, x0 = [Seed[0:2], Seed[4]])
-            Seed = [Seed[0:2], 1/options.expN, Seed[3]] #ToDo check whether row or colum vector
+            Seed = [Seed[0:2], 1/options['expN'], Seed[3]] #ToDo check whether row or colum vector
         result['X1D'] = gridSetting(data,options, Seed) 
     
     
     else: # for types which do not need a MAP estimate
-        if (options.gridSetType == 'priorlike' or options.gridSetType == 'STD'
-            or options.gridSetType == 'exp' or options.gridSetType == '4power'):
+        if (options['gridSetType'] == 'priorlike' or options['gridSetType'] == 'STD'
+            or options['gridSetType'] == 'exp' or options['gridSetType'] == '4power'):
                 result['X1D'] = gridSetting(data,options) 
         else: # Use a linear grid
             for idx in range[0:d]:
                 # If there is an actual Interval
-                if options.borders[idx, 0] < options.borders[idx,1]: 
+                if options['borders'][idx, 0] < options['borders'][idx,1]: 
                     #result.X1D[id] = linspace(bla)
-                    result['X1D'][idx] = np.linspace(options.borders[idx,1], options.borders[idx,2],
-                                    num=options.stepN[idx])
+                    result['X1D'][idx] = np.linspace(options['borders'][idx,1], options['borders'][idx,2],
+                                    num=options['stepN'][idx])
                 # if parameter was fixed
                 else:
-                    result['X1D'][idx] = options.borders[idx,0]
+                    result['X1D'][idx] = options['borders'][idx,0]
                     
     '''Evaluate likelihood and form it into a posterior'''
     
@@ -77,7 +77,7 @@ def psignifitCore(data, options):
         result['marginals'][idx], result['marginalsX'][idx], result['marginalsW'][idx] = marginalize(result, idx)
         
     '''Find point estimate'''
-    if (options.estimateType == 'MAP' or options.estimateType == 'MLE'):
+    if (options['estimateType'] == 'MAP' or options['estimateType'] == 'MLE'):
         # get MLE estimate
     
         #start at most likely grid point
@@ -88,15 +88,15 @@ def psignifitCore(data, options):
         for idx in range[0:d]:
             Fit[idx] = result['X1D'][idx](index[idx]) #TODO the round braces?
         
-        if options.expType == 'YesNo':
+        if options['expType'] == 'YesNo':
             fun = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
             x0 = copy.deepcopy(Fit)
-        elif options.expType == 'nAFC':
-            fun = lambda X:  -l.logLikelihood(data,options, X[0], X[1], X[2], 1/options.expN, X[3])
+        elif options['expType'] == 'nAFC':
+            fun = lambda X:  -l.logLikelihood(data,options, X[0], X[1], X[2], 1/options['expN'], X[3])
             x0 = copy.deepcopy(Fit[0:2])
             x0 = np.append(x0,Fit[4])
             x0 = np.transpose(x0)
-        elif options.expType == 'equalAsymptote':
+        elif options['expType'] == 'equalAsymptote':
             fun = lambda X: -l.logLikelihood(data,options, X[0], X[1], X[2], np.nan, X[3])
             x0 = copy.deepcopy(Fit[0:2])
             x0 = np.append(x0,Fit[4])
@@ -104,7 +104,7 @@ def psignifitCore(data, options):
         else:
             raise ValueError('unknown expType')
             
-        if options.fastOptim:
+        if options['fastOptim']:
             #TODO check if dictionary works
             optimiseOptions = {'xtol':0, 'ftol':0, 'maxiter': 100, 'maxfun': 100}
             # or maybe optimiseOptions = (0,0,100,100)
@@ -115,19 +115,19 @@ def psignifitCore(data, options):
         
         Fit =scipy.optimize.fmin(fun, x0, optimiseOptions) #TODO check if that works this way         
         
-        if options.expType == 'YesNo':
+        if options['expType'] == 'YesNo':
             result['Fit'] = copy.deepcopy(Fit)
-        elif options.expType == 'nAFC': #TODO is this row or column vectors?
-            result['Fit'] = np.transpose([Fit[0:2], 1/options.expN, Fit[3]])
-        elif options.expType =='equalAsymptote':
+        elif options['expType'] == 'nAFC': #TODO is this row or column vectors?
+            result['Fit'] = np.transpose([Fit[0:2], 1/options['expN'], Fit[3]])
+        elif options['expType'] =='equalAsymptote':
             result['Fit'] = np.transpose([Fit[0:2], Fit[2], Fit[3]])
         else:
             raise ValueError('unknown expType')
     
-        par_idx = np.where(np.isnan(options.fixedPars) == False)
-        result['Fit'][par_idx] = options.fixedPars[par_idx] #TODO check
+        par_idx = np.where(np.isnan(options['fixedPars']) == False)
+        result['Fit'][par_idx] = options['fixedPars'][par_idx] #TODO check
             
-    elif options.estimateType == 'mean':
+    elif options['estimateType'] == 'mean':
         # get mean estimate
         Fit = np.zeros([d,1])
         for idx in range[0:d]:
@@ -140,7 +140,7 @@ def psignifitCore(data, options):
     result['data'] = data
     
     '''Compute confidence intervals'''
-    if ~options.fastOptim:
+    if ~options['fastOptim']:
         result['conf_Intervals'] = getConfRegion(result)
         
     return result
