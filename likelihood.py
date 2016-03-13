@@ -141,25 +141,25 @@ def logLikelihood(data,options, **kwargs):
             if options.verbose > 3: 
                 print('\r%d/%d', i,n)
             xi = levels[i]
-            psi = sigmoidHandle(xi,alpha,beta.ravel()) #TODO
-            psi = psi*scale + gamma
-            
+            psi = sigmoidHandle(xi,alpha[...,np.newaxis],beta) 
+            psi = psi[...,np.newaxis, np.newaxis]*scale + gamma
+            psi = psi[..., np.newaxis]
             ni = np.array(data[i,2])
             ki = np.array(data[i,1])
             
             if ((ni-ki)>0 and ki > 0):
                 pbin = pbin + ki * np.log(psi) + (ni-ki)*np.log(1-psi)
-                if not(np.empty(v)):
+                if (v.size != 0):
                     a = psi * v
                     b = (1-psi)*v
                     p = p + sp.gammaln(ki+a) + sp.gammaln(ni-ki+b)
                     p = p - sp.gammaln(ni+v) - sp.gammaln(a) - sp.gammaln(b)
-                    p = p + sp.gammaln(v)
+                    p = p +sp.gammaln(v)
                 else:
                     p = np.array([])
             elif ki > 0:    # --> ni-ki == 0
                 pbin  = pbin + ki * np.log(psi);
-                if not(np.empty(v)):                                             
+                if (v.size != 0):                                             
                     a = psi*v
                     p = p + sp.gammaln(ki + a)
                     p = p - sp.gammaln(ni+v)
@@ -170,7 +170,7 @@ def logLikelihood(data,options, **kwargs):
             
             elif (ni-ki) > 0 :  # --> ki ==0
                 pbin = pbin  + (ni-ki)*np.log(1-psi)
-                if not(np.empty(v)):
+                if (v.size != 0):
                     b = (1-psi)*v
                     p = p + sp.gammaln(ni-ki+b)
                     p = p - sp.gammaln(ni+v) - sp.gammaln(b)
@@ -181,10 +181,10 @@ def logLikelihood(data,options, **kwargs):
         if options.verbose > 3 :
             print('\n')
         
-        p = np.concatenate(5,np.matlib.repmat(pbin, [1,1,1,1,sum(vbinom)]),p)
+        p = np.concatenate((np.tile(pbin, [1,1,1,1,np.sum(vbinom)]),p), axis=4)
         p[np.isnan(p)] = -np.inf
 
-    if not(np.empty(options.priors)):
+    if (options.priors):
         if isinstance(options.priors, list):
             if hasattr(options.priors[0], '__call__'):
                 p = p + np.log(options.priors[0](alpha))

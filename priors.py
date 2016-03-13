@@ -14,7 +14,7 @@ from utils import my_betapdf, my_norminv
 def prior1(x, xspread, stimRange):
     
     r = (x >= (stimRange[0]-.5*xspread))*(x<=stimRange[0])*(.5+.5*np.cos(2*np.pi*(stimRange[0]-x)/xspread)) \
-        + (x>stimRange[0])*(x<stimRange[1]) + (x>=stimRange[1])*(x<=stimRange[1]+.5*xspread)*(.5+.5*np.cos(2*np.pi*(x-stimRange[1])/xspread))
+    + (x>stimRange[0])*(x<stimRange[1]) + (x>=stimRange[1])*(x<=stimRange[1]+.5*xspread)*(.5+.5*np.cos(2*np.pi*(x-stimRange[1])/xspread))
         
     return r
 
