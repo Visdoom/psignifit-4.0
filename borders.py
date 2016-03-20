@@ -125,14 +125,14 @@ def moveBorders(data,options):
     MBresult['weight'] = getWeights(MBresult['X1D'])
     kwargs = {'alpha': None, 'beta':None , 'lambda': None,'gamma':None , 'varscale':None }
     fill_kwargs(kwargs,MBresult['X1D'])
-    MBresult['Posterior'] = likelihood(data, options, **kwargs)[0] # TODO check!
+    MBresult['Posterior'] = likelihood(data, options, **kwargs)[0] 
     integral = sum(np.reshape(MBresult['Posterior'], -1) * np.reshape(MBresult['weight'], -1))
     MBresult['Posterior'] /= integral
 
     borders = np.zeros([d,2])    
     
     for idx in range(0,d):
-        (L1D,x,w) = marginalize(MBresult, idx)
+        (L1D,x,w) = marginalize(MBresult, np.array([idx]))
         x1 = x[np.max(np.where(L1D*w >= tol)[0] - 1, 1)]
         x2 = x[np.min(np.where(L1D*w >= tol)[-1]+1, len(x))]
         
