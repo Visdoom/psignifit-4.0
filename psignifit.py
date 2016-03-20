@@ -205,7 +205,7 @@ def psignifit(data, options):
             'You can force acceptence of your blocks by increasing options.nblocks')
         data = poolData(data, options)
     
-    options['nblocks'] = len(data)
+    #options['nblocks'] = len(data)
     
     # create function handle of sigmoid
     options['sigmoidHandle'] = getSigmoidHandle(options)

@@ -47,7 +47,7 @@ def setBorders(data,options):
         data[:,0] = np.log(data[:,0])
     
     # if range was not given take from data
-    if np.ravel(options['stimulusRange']).size <= 1 :
+    if options['stimulusRange'].size <= 1 :
         options['stimulusRange'] = np.array([min(data[:,0]), max(data[:,0])])
         stimRangeSet = False
     else:
@@ -125,7 +125,7 @@ def moveBorders(data,options):
     MBresult['weight'] = getWeights(MBresult['X1D'])
     kwargs = {'alpha': None, 'beta':None , 'lambda': None,'gamma':None , 'varscale':None }
     fill_kwargs(kwargs,MBresult['X1D'])
-    MBresult['Posterior'] = likelihood(data, options, **kwargs) # TODO check!
+    MBresult['Posterior'] = likelihood(data, options, **kwargs)[0] # TODO check!
     integral = sum(np.reshape(MBresult['Posterior'], -1) * np.reshape(MBresult['weight'], -1))
     MBresult['Posterior'] /= integral
 

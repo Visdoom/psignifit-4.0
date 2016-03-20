@@ -143,7 +143,6 @@ def logLikelihood(data,options, **kwargs):
             xi = levels[i]
             psi = sigmoidHandle(xi,alpha,beta) 
             psi = psi*scale + gamma
-            psi = psi
             ni = np.array(data[i,2])
             ki = np.array(data[i,1])
             

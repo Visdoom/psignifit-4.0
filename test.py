@@ -57,19 +57,10 @@ options['CImethod']    = 'percentiles'
 options['gridSetType'] = 'cumDist'
 options['nblocks']     = 25
 options['verbose']     = 0 
-options['stimulusRange'] = 0
+#options['stimulusRange'] = 0
 options['fastOptim']   = 0
 options['mbStepN']     = np.array([30,40,10,1,20])
 options['logspace']    = 0
-options['priors']      = p.getStandardPriors(data,options)
-
-x = np.linspace(-0.0035,0.0145,1000)
-#xspread= 0.0090000000000000011
-#stimRange = np.array([0.001,0.01])
-#p.prior1(x,xspread,stimRange)
-p.checkPriors(data,options)
-#options.borders
-options['sigmoidHandle'] = getSigmoidHandle(options)
 
 temp_data= importer.loadmat('variables.mat', struct_as_record=True,matlab_compatible=True)
 temp_options = importer.loadmat('options.mat', struct_as_record=False, squeeze_me=True)

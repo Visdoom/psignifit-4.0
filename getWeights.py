@@ -6,7 +6,7 @@ this function calculates the weights for integration/the volume of the
 cuboids given by the 1 dimensional borders in X1D
 
 """
-from numpy import tile, reshape, ones, array, newaxis, where
+from numpy import tile, reshape, ones, array, newaxis, where, multiply
 from scipy.ndimage.filters import convolve 
 from scipy import diff
 
@@ -37,9 +37,9 @@ def getWeights(X1D):
     for idx in range(0,d):
         if Xlength[idx] > 1:
             if idx > 1:
-                weight = weight[...,newaxis]*diff(Xreshape[idx], axis=idx)
+                weight = multiply(weight[...,newaxis],diff(Xreshape[idx], axis=idx))
             else:
-                weight = weight*diff(Xreshape[idx], axis=idx) 
+                weight = multiply(weight,diff(Xreshape[idx], axis=idx))
         else:
             weight = weight[...,newaxis]
     #2) sum to get weight for each point
