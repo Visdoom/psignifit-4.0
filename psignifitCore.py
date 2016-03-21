@@ -30,7 +30,7 @@ from marginalize import marginalize
 def psignifitCore(data, options):
     
     d = len(options['borders'])
-    result = {}
+    result = {'X1D': []}
     
     '''Choose grid dynamically from data'''
     if options['dynamicGrid']:
@@ -53,15 +53,15 @@ def psignifitCore(data, options):
             or options['gridSetType'] == 'exp' or options['gridSetType'] == '4power'):
                 result['X1D'] = gridSetting(data,options) 
         else: # Use a linear grid
-            for idx in range[0:d]:
+            for idx in range(0,d):
                 # If there is an actual Interval
                 if options['borders'][idx, 0] < options['borders'][idx,1]: 
                     #result.X1D[id] = linspace(bla)
-                    result['X1D'][idx] = np.linspace(options['borders'][idx,1], options['borders'][idx,2],
-                                    num=options['stepN'][idx])
+                    result['X1D'].append(np.linspace(options['borders'][idx,0], options['borders'][idx,1],
+                                    num=options['stepN'][idx]))
                 # if parameter was fixed
                 else:
-                    result['X1D'][idx] = options['borders'][idx,0]
+                    result['X1D'].append(options['borders'][idx,0])
                     
     '''Evaluate likelihood and form it into a posterior'''
     
@@ -73,7 +73,7 @@ def psignifitCore(data, options):
     
     '''Compute marginal distributions'''
     
-    for idx in range[0,d]:
+    for idx in range(0,d):
         result['marginals'][idx], result['marginalsX'][idx], result['marginalsW'][idx] = marginalize(result, idx)
         
     '''Find point estimate'''
@@ -85,7 +85,7 @@ def psignifitCore(data, options):
       
         index = np.unravel_index(idx, result['Posterior'].shape)
         Fit = np.zeros([d,1])
-        for idx in range[0:d]:
+        for idx in range(0,d):
             Fit[idx] = result['X1D'][idx](index[idx]) #TODO the round braces?
         
         if options['expType'] == 'YesNo':

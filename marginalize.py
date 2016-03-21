@@ -15,10 +15,9 @@ of the grid.
 
 """
 import numpy as np
-from copy import deepcopy
 
 def marginalize(result, dimension):
-        
+   
       #TODO make dimension checks suitable for 1 and 
       assert(dimension.all() in range(0,5), 'the dimensions you want to marginalize to  should be given as a vector of numbers 0 to 4')
         
@@ -40,21 +39,19 @@ def marginalize(result, dimension):
                   x = np.nan
               
               # calculate mass at each grid point
-              #TODO check the reference , copy cluster fuck here
-              marginal_ = result['weight']*result['Posterior']
-              marginal = deepcopy(marginal_)  
-              weight_ = result['weight']
-              weight = deepcopy(weight_) 
+              marginal = result['weight']*result['Posterior']
+              weight = result['weight']
+              
               for i in range(0,d):
                   if not(any(i == dimension)) and marginal.shape[i] > 1:
-                      marginal = np.sum(marginal_,i)
-                      weight = np.sum(weight_,i)/(np.max(result['X1D'][i])-np.min(result['X1D'][i]))
+                      marginal = np.sum(marginal,i, keepdims=True)
+                      weight = np.sum(weight,i, keepdims=True)/(np.max(result['X1D'][i])-np.min(result['X1D'][i]))
               marginal = marginal/weight
               
               if len(dimension) == 1:
-                  marginal = np.reshape(marginal, [],1)
-                  weight = np.reshape(weight, [],1)
-                  x = np.reshape(x,[],1)
+                  marginal = np.reshape(marginal, -1,1)
+                  weight = np.reshape(weight, -1,1)
+                  x = np.reshape(x,-1,1)
               else:
                   marginal = np.array(marginal)
                   weight = np.array(weight)

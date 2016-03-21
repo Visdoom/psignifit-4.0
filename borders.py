@@ -133,8 +133,8 @@ def moveBorders(data,options):
     
     for idx in range(0,d):
         (L1D,x,w) = marginalize(MBresult, np.array([idx]))
-        x1 = x[np.max(np.where(L1D*w >= tol)[0] - 1, 1)]
-        x2 = x[np.min(np.where(L1D*w >= tol)[-1]+1, len(x))]
+        x1 = x[np.max([np.where(L1D*w >= tol)[0][0] - 1, 0])]
+        x2 = x[np.min([np.where(L1D*w >= tol)[0][-1]+1, len(x)-1])]
         
         borders[idx,:] = [x1,x2]
     
