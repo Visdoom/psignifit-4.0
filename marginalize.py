@@ -23,7 +23,7 @@ def marginalize(result, dimension):
         
       d = len(result['X1D'])
         
-      if len(dimension) == 1 and ('marginals' in result.keys()) and len(result['marginals']) >= dimension:
+      if len(dimension) == 1 and ('marginals' in result.keys()) and len(result['marginals'])-1 >= dimension:
           marginal = result['marginals'][dimension]
           weight = result['marginalsW'][dimension]
           x = result['marginalsX'][dimension]
