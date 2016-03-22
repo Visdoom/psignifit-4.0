@@ -9,7 +9,7 @@ Created on Sat Mar  5 17:14:59 2016
 import numpy as np
 import warnings 
 
-from utils import my_norminv 
+from utils import my_norminv, fill_kwargs
 from getWeights import getWeights 
 from likelihood import likelihood
 from marginalize import marginalize
@@ -123,9 +123,9 @@ def moveBorders(data,options):
            
         
     MBresult['weight'] = getWeights(MBresult['X1D'])
-    kwargs = {'alpha': None, 'beta':None , 'lambda': None,'gamma':None , 'varscale':None }
-    fill_kwargs(kwargs,MBresult['X1D'])
-    MBresult['Posterior'] = likelihood(data, options, **kwargs)[0] 
+    #kwargs = {'alpha': None, 'beta':None , 'lambda': None,'gamma':None , 'varscale':None }
+    #fill_kwargs(kwargs,MBresult['X1D'])
+    MBresult['Posterior'] = likelihood(data, options, MBresult['X1D'])[0] 
     integral = sum(np.reshape(MBresult['Posterior'], -1) * np.reshape(MBresult['weight'], -1))
     MBresult['Posterior'] /= integral
 
@@ -140,20 +140,7 @@ def moveBorders(data,options):
     
     return borders
 
-def fill_kwargs(kw_args, values):
-    
-    d = len(values)    
-    for i in range(0,d):
-        if i == 0:
-            kw_args['alpha'] = values[0]
-        if i == 1:
-            kw_args['beta'] = values[1]
-        if i == 2:
-            kw_args['lambda'] = values[2]
-        if i == 3:
-            kw_args['gamma'] = values[3]
-        if i == 4:
-            kw_args['varscale'] = values[4]
+
         
     
 if __name__ == "__main__":

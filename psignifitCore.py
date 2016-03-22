@@ -14,7 +14,7 @@ the width (distance containing 95% of the function
 @author: root
 """
 import numpy as np
-import copy
+from copy import deepcopy
 import scipy
 import warnings
 
@@ -25,12 +25,13 @@ from getWeights import getWeights
 from getConfRegion import getConfRegion
 from getSeed import getSeed
 from marginalize import marginalize
-
+from utils import fill_kwargs
 
 def psignifitCore(data, options):
+        
     
     d = len(options['borders'])
-    result = {'X1D': []}
+    result = {'X1D': [], 'marginals': [], 'marginalsX': [], 'marginalsW': []}
     
     '''Choose grid dynamically from data'''
     if options['dynamicGrid']:
@@ -61,11 +62,12 @@ def psignifitCore(data, options):
                                     num=options['stepN'][idx]))
                 # if parameter was fixed
                 else:
-                    result['X1D'].append(options['borders'][idx,0])
+                    result['X1D'].append(np.array([options['borders'][idx,0]]))
                     
     '''Evaluate likelihood and form it into a posterior'''
-    
-    (result['Posterior'], result['logPmax']) = l.likelihood(data, options, result['X1D'][:])
+    #kwargs = {'alpha': None, 'beta':None , 'lambda': None,'gamma':None , 'varscale':None }
+    #fill_kwargs(kwargs,result['X1D'])
+    (result['Posterior'], result['logPmax']) = l.likelihood(data, options, result['X1D'])
     result['weight'] = getWeights(result['X1D'])
     integral = np.sum(np.array(result['Posterior'][:])*np.array(result['weight'][:]))
     result['Posterior'] = result['Posterior']/integral
@@ -74,33 +76,38 @@ def psignifitCore(data, options):
     '''Compute marginal distributions'''
     
     for idx in range(0,d):
-        result['marginals'][idx], result['marginalsX'][idx], result['marginalsW'][idx] = marginalize(result, idx)
+        m, mX, mW = marginalize(result, np.array([idx]))
+        result['marginals'].append(m)
+        result['marginalsX'].append(mX)
+        result['marginalsW'].append(mW) 
         
     '''Find point estimate'''
-    if (options['estimateType'] == 'MAP' or options['estimateType'] == 'MLE'):
+    if (options['estimateType'] in ['MAP','MLE']):
         # get MLE estimate
     
         #start at most likely grid point
-        (_, idx) = max(result['Posterior'][:])
+        index = np.where(result['Posterior'] == np.max(result['Posterior'].ravel()))
       
-        index = np.unravel_index(idx, result['Posterior'].shape)
         Fit = np.zeros([d,1])
         for idx in range(0,d):
-            Fit[idx] = result['X1D'][idx](index[idx]) #TODO the round braces?
+            Fit[idx] = result['X1D'][idx][index[idx]] 
         
         if options['expType'] == 'YesNo':
-            fun = lambda X: -l.logLikelihood(data, options, X[0], X[1], X[2], X[3], X[4])
-            x0 = copy.deepcopy(Fit)
+            fun = lambda X: -l.logLikelihood(data, options, [X[0],X[1],X[2],X[3],X[4]])
+            x0 = deepcopy(Fit)
+            #fill_kwargs(kwargs,x0)
         elif options['expType'] == 'nAFC':
-            fun = lambda X:  -l.logLikelihood(data,options, X[0], X[1], X[2], 1/options['expN'], X[3])
-            x0 = copy.deepcopy(Fit[0:2])
+            fun = lambda X:  -l.logLikelihood(data,options, [X[0], X[1], X[2], 1/options['expN'], X[3]])
+            x0 = deepcopy(Fit[0:3]) # Fit[3]  is excluded
             x0 = np.append(x0,Fit[4])
             x0 = np.transpose(x0)
+            #fill_kwargs(kwargs,[x0[0], x0[1], x0[2], 1/options['expN'], x0[3]])
         elif options['expType'] == 'equalAsymptote':
-            fun = lambda X: -l.logLikelihood(data,options, X[0], X[1], X[2], np.nan, X[3])
-            x0 = copy.deepcopy(Fit[0:2])
+            fun = lambda X: -l.logLikelihood(data,options,[X[0], X[1], X[2], np.nan, X[3]])
+            x0 = deepcopy(Fit[0:3])
             x0 = np.append(x0,Fit[4])
             x0 = np.transpose(x0)
+            #fill_kwargs(kwargs, [x0[0], x0[1], x0[2], np.nan, x0[3]])
         else:
             raise ValueError('unknown expType')
             
@@ -116,7 +123,7 @@ def psignifitCore(data, options):
         Fit =scipy.optimize.fmin(fun, x0, optimiseOptions) #TODO check if that works this way         
         
         if options['expType'] == 'YesNo':
-            result['Fit'] = copy.deepcopy(Fit)
+            result['Fit'] = deepcopy(Fit)
         elif options['expType'] == 'nAFC': #TODO is this row or column vectors?
             result['Fit'] = np.transpose([Fit[0:2], 1/options['expN'], Fit[3]])
         elif options['expType'] =='equalAsymptote':
@@ -133,7 +140,7 @@ def psignifitCore(data, options):
         for idx in range[0:d]:
             Fit[idx] = np.sum(result['marginals'][idx]*result['marginalsW'][idx]*result['marginalsX'][idx])
         
-        result['Fit'] = copy.deepcopy(Fit)
+        result['Fit'] = deepcopy(Fit)
         Fit = np.empty(Fit.shape)
     '''Include input into result'''
     result['options'] = options # no copies here, because they are not changing

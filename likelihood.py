@@ -2,7 +2,7 @@
 import numpy as np
 import scipy.special as sp
 
-def likelihood(data, options, **kwargs):
+def likelihood(data, options, args):
     """
     calculates the (normalized) likelihood for the data from given parameters
     function [p,logPmax] = likelihood(typeHandle,data,alpha,beta,lambda,gamma)
@@ -13,7 +13,7 @@ def likelihood(data, options, **kwargs):
 
     """
     
-    p = logLikelihood(data, options, **kwargs)
+    p = logLikelihood(data, options, args)
         
     '''We never need the actual value of the likelihood. Something proportional
     is enough and this circumvents numerical problems for the likelihood to
@@ -27,7 +27,7 @@ def likelihood(data, options, **kwargs):
     return (p,logPmax)
 
 
-def logLikelihood(data,options, **kwargs):
+def logLikelihood(data,options, args):
     """
     Created on Mon Nov 30 22:19:05 2015
     the core function to evaluate the logLikelihood of the data
@@ -43,27 +43,23 @@ def logLikelihood(data,options, **kwargs):
 
     
     sigmoidHandle = options['sigmoidHandle']
-    
-    if (not('alpha' in kwargs.keys())): 
+    if len(args) < 2:
         raise ValueError('not enough input parameters')
     else:
-        alpha = kwargs['alpha']
-    if (not('beta' in kwargs.keys())):
-        raise ValueError('not enough input parameters')
-    else:
-        beta = kwargs['beta']
-    if (not('lambda' in kwargs.keys()) or kwargs['lambda'] == None):
-        lamb = 0
-    else:
-        lamb = kwargs['lambda']
-    if (not('gamma' in kwargs.keys()) or kwargs['gamma'] == None):
-        gamma = .5
-    else:
-        gamma = kwargs['gamma']
-    if (not('varscale' in kwargs.keys()) or kwargs['varscale'] == None):
-        varscale = 1
-    else:
-        varscale = kwargs['varscale']
+        alpha = args[0]
+        beta = args[1]        
+        if len(args) > 2:
+            lamb = args[2]
+        else:
+            lamb = 0
+        if len(args) > 3:
+            gamma = args[3]
+        else:
+            gamma = 0.5
+        if len(args) > 4:
+            varscale = args[4]
+        else:
+            varscale = 1
     
     # is the input only one point?
     oneParameter = not(len(alpha) > 1 or len(beta) > 1 or len(lamb) > 1 

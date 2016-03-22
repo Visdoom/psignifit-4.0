@@ -48,7 +48,7 @@ def gridSetting(data,options,Seed):
                     elif idx == 5:
                         varscale = Xtest1D
                     
-                    Like1D = likelihood(data, options, alpha, beta, l, gamma, varscale)
+                    Like1D = likelihood(data, options, [alpha, beta, l, gamma, varscale])
                     Like1D = Like1D + np.mean(Like1D)*options['UniformWeight']
                     Like1D = np.cumsum(Like1D)
                     Like1D = Like1D/max(Like1D)
@@ -90,7 +90,7 @@ def gridSetting(data,options,Seed):
                         varscale = Xtest1D
                         
                     # calc likelihood on the line                        
-                    Like1D = likelihood(data, options, alpha, beta, l, gamma, varscale)
+                    Like1D = likelihood(data, options, [alpha, beta, l, gamma, varscale])
                     Like1D = np.abs(np.convolve(np.squeeze(Like1D), np.array([1,-2,1]), mode='same'))
                     Like1D = Like1D + np.mean(Like1D)*options['UniformWeight']
                     Like1D = np.cumsum(Like1D)

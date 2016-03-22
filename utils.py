@@ -3,7 +3,7 @@
 Utils class capsulating all custom made probabilistic functions
 """
 
-from numpy import log, log1p, exp, sqrt, tan, pi, nan, isnan, inf, zeros, shape, ravel, tile, logical_and, logical_or
+from numpy import ndarray, array, log, log1p, exp, sqrt, tan, pi, nan, isnan, inf, zeros, shape, ravel, tile, logical_and, logical_or
 from scipy.special import betainc,betaln,erfcinv, erfc
 
 def my_norminv(p,mu,sigma):
@@ -88,16 +88,33 @@ def fill_kwargs(kw_args, values):
     Fill the empty dictionary kw_args with the values given in values.
     values are assigned in the order alpha, beta, lambda, gamma, varscale.
     '''
+    
+    kw_args.clear()
     d = len(values)    
     for i in range(0,d):
         if i == 0:
-            kw_args['alpha'] = values[0]
+            if type(values[0]) == ndarray:
+                kw_args['alpha'] = values[0]
+            else:
+                kw_args['alpha'] = array([values[0]])
         if i == 1:
-            kw_args['beta'] = values[1]
+            if type(values[1]) == ndarray:
+                kw_args['beta'] = values[1]
+            else:
+                kw_args['beta'] = array([values[1]])                
         if i == 2:
-            kw_args['lambda'] = values[2]
+            if type(values[2]) == ndarray:
+                kw_args['lambda'] = values[2]
+            else:
+                kw_args['lambda'] = array([values[2]])
         if i == 3:
-            kw_args['gamma'] = values[3]
+            if type(values[3]) == ndarray:
+                kw_args['gamma'] = values[3]
+            else:
+                kw_args['gamma'] = array([values[3]])
         if i == 4:
-            kw_args['varscale'] = values[4]
+            if type(values[4]) == ndarray:
+                kw_args['varscale'] = values[4]
+            else:
+                kw_args['varscale'] = array([values[4]])
         
