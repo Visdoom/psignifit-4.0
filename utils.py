@@ -82,3 +82,22 @@ def my_betapdf(x,a,b):
     y[k] = exp(loga+logb - betaln(a,b))
 
     return y
+    
+def fill_kwargs(kw_args, values):
+    '''
+    Fill the empty dictionary kw_args with the values given in values.
+    values are assigned in the order alpha, beta, lambda, gamma, varscale.
+    '''
+    d = len(values)    
+    for i in range(0,d):
+        if i == 0:
+            kw_args['alpha'] = values[0]
+        if i == 1:
+            kw_args['beta'] = values[1]
+        if i == 2:
+            kw_args['lambda'] = values[2]
+        if i == 3:
+            kw_args['gamma'] = values[3]
+        if i == 4:
+            kw_args['varscale'] = values[4]
+        
