@@ -46,20 +46,36 @@ def logLikelihood(data,options, args):
     if len(args) < 2:
         raise ValueError('not enough input parameters')
     else:
-        alpha = args[0]
-        beta = args[1]        
+        if hasattr(args[0], '__iter__'):
+            alpha = args[0]
+        else:
+            alpha = np.array([args[0]])
+        if hasattr(args[1], '__iter__'):
+            beta = args[1]        
+        else:
+            beta = np.array([args[1]])
+            
         if len(args) > 2:
-            lamb = args[2]
+            if hasattr(args[2], '__iter__'):
+                lamb = args[2]
+            else:
+                lamb = np.array([args[2]])
         else:
-            lamb = 0
+            lamb = np.array([0])
         if len(args) > 3:
-            gamma = args[3]
+            if hasattr(args[3], '__iter__'):
+                gamma = args[3]
+            else:
+                gamma = np.array([args[3]])
         else:
-            gamma = 0.5
+            gamma = np.array([0.5])
         if len(args) > 4:
-            varscale = args[4]
+            if hasattr(args[4], '__iter__'):
+                varscale = args[4]
+            else:
+                varscale = np.array([args[4]])
         else:
-            varscale = 1
+            varscale = np.array([1])
     
     # is the input only one point?
     oneParameter = not(len(alpha) > 1 or len(beta) > 1 or len(lamb) > 1 
@@ -106,7 +122,7 @@ def logLikelihood(data,options, args):
             p = p + sp.gammaln(k+a) + sp.gammaln(n-k+b)
             p = p -sp.gammaln(n+v) - sp.gammaln(a) - sp.gammaln(b)
             p = p + sp.gammaln(v)
-        p = sum(p)  # add up log likelihood
+        p = np.sum(p)  # add up log likelihood
         if np.isnan(p):
             p = - np.inf
     else:       # for grid evaluation

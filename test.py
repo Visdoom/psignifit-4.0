@@ -8,9 +8,11 @@ Created on Thu Nov 26 19:21:33 2015
 #from collection import namedtuple
 import numpy as np
 import scipy.io as importer
+from scipy.optimize import fmin
 import psignifit as ps
 from getSigmoidHandle import getSigmoidHandle 
 import priors as p
+from likelihood import logLikelihood
 from utils import my_norminv, my_normcdf
 #from utils import my_betapdf
 
@@ -86,6 +88,10 @@ beta = np.array([[  1.73472348e-16,   6.92307692e-04,   1.38461538e-03,
           2.28461538e-02,   2.35384615e-02,   2.42307692e-02,
           2.49230769e-02,   2.56153846e-02,   2.63076923e-02,
           2.70000000e-02]])
+          
+
+#func = lambda x,f: -logLikelihood(data, options, [x[0], x[1], x[2], x[3], x[4]])
+#fmin(func, x0 = [0,0,0,0,0], args = (0,)) 
 
 
 res = ps.psignifit(data, options)

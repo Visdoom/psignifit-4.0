@@ -93,41 +93,46 @@ def psignifitCore(data, options):
             Fit[idx] = result['X1D'][idx][index[idx]] 
         
         if options['expType'] == 'YesNo':
-            fun = lambda X: -l.logLikelihood(data, options, [X[0],X[1],X[2],X[3],X[4]])
+            fun = lambda X, f: -l.logLikelihood(data, options, [X[0],X[1],X[2],X[3],X[4]])
             x0 = deepcopy(Fit)
-            #fill_kwargs(kwargs,x0)
+            a = None
+            
         elif options['expType'] == 'nAFC':
-            fun = lambda X:  -l.logLikelihood(data,options, [X[0], X[1], X[2], 1/options['expN'], X[3]])
+            #def func(X,f):
+            #    return -l.logLikelihood(data,options, [X[0], X[1], X[2], f, X[3]])
+            #fun = func
+            fun = lambda X, f:  -l.logLikelihood(data,options, [X[0], X[1], X[2], f, X[3]])
             x0 = deepcopy(Fit[0:3]) # Fit[3]  is excluded
-            x0 = np.append(x0,Fit[4])
-            x0 = np.transpose(x0)
-            #fill_kwargs(kwargs,[x0[0], x0[1], x0[2], 1/options['expN'], x0[3]])
+            x0 = np.append(x0,deepcopy(Fit[4]))
+            a = np.array([1/options['expN']])
+            
         elif options['expType'] == 'equalAsymptote':
-            fun = lambda X: -l.logLikelihood(data,options,[X[0], X[1], X[2], np.nan, X[3]])
+            fun = lambda X, f: -l.logLikelihood(data,options,[X[0], X[1], X[2], f, X[3]])
             x0 = deepcopy(Fit[0:3])
-            x0 = np.append(x0,Fit[4])
-            x0 = np.transpose(x0)
-            #fill_kwargs(kwargs, [x0[0], x0[1], x0[2], np.nan, x0[3]])
+            x0 = np.append(x0,deepcopy(Fit[4]))
+            a =  np.array([np.nan])
+           
         else:
             raise ValueError('unknown expType')
             
-        if options['fastOptim']:
-            #TODO check if dictionary works
-            optimiseOptions = {'xtol':0, 'ftol':0, 'maxiter': 100, 'maxfun': 100}
-            # or maybe optimiseOptions = (0,0,100,100)
+        if options['fastOptim']:           
+            Fit = scipy.optimize.fmin(fun, x0, args = (a,), xtol=0, ftol = 0, maxiter = 100, maxfun=100)
             warnings.warn('changed options for optimization')
-        else:
-            optimiseOptions = {'disp':False}
-            #or maybe optimiseOptions = (_,_,_,_,_,False)
-        
-        Fit =scipy.optimize.fmin(fun, x0, optimiseOptions) #TODO check if that works this way         
-        
+        else:            
+            Fit = scipy.optimize.fmin(fun, x0, args = (a,), disp = False)
+          
         if options['expType'] == 'YesNo':
             result['Fit'] = deepcopy(Fit)
         elif options['expType'] == 'nAFC': #TODO is this row or column vectors?
-            result['Fit'] = np.transpose([Fit[0:2], 1/options['expN'], Fit[3]])
+            fit = deepcopy(Fit[0:3])
+            fit = np.append(fit, np.array([1/options['expN']]))
+            fit = np.append(fit, deepcopy(Fit[3]))
+            result['Fit'] = fit.transpose()
         elif options['expType'] =='equalAsymptote':
-            result['Fit'] = np.transpose([Fit[0:2], Fit[2], Fit[3]])
+            fit = deepcopy(Fit[0:3])
+            fit = np.append(fit, Fit[2])
+            fit = np.append(fit, Fit[3])
+            result['Fit'] = fit.transpose()
         else:
             raise ValueError('unknown expType')
     
