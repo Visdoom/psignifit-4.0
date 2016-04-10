@@ -118,3 +118,16 @@ def fill_kwargs(kw_args, values):
             else:
                 kw_args['varscale'] = array([values[4]])
         
+def strToDim(string):
+    """
+    Finds the number corresponding to a dim/parameter given as a string. 
+    """
+    string = string.lower()
+    if   string in ['threshold', 'thresh', 'm', 't', 'alpha']:    return 0
+    elif string in ['width', 'w', 'beta']:                        return 1
+    elif string in ['lapse', 'lambda', 'lapserate', 'lapse rate',
+                    'lapse-rate', 'upper asymptote', 'l']:        return 2
+    elif string in ['guess', 'gamma', 'guessrate', 'guess rate',
+                    'guess-rate', 'lower asymptote', 'g']:        return 3
+    elif string in ['sigma', 'std', 's']:                         return 4
+
