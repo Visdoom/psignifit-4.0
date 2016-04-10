@@ -126,7 +126,7 @@ def plotPsych(result,
     # tried to mimic box('off') in matlab, as box('off') in python works differently
     plt.tick_params(direction='out',right='off',top='off')
     for side in ['top','right']: axisHandle.spines[side].set_visible(False)
-    plt.ticklabel_format(style='sci',scilimits=(-2,2))
+    plt.ticklabel_format(style='sci',scilimits=(-2,4))
     
     plt.hold(holdState)
     
@@ -179,7 +179,7 @@ def plotsModelfit(result):
     plt.title('Psychometric Function', fontsize=20)
     plt.tick_params(right='off',top='off')
     for side in ['top','right']: ax.spines[side].set_visible(False)
-    plt.ticklabel_format(style='sci',scilimits=(-2,2))   
+    plt.ticklabel_format(style='sci',scilimits=(-2,4))   
     
     ax = plt.subplot(1,3,2)
     # stimulus level vs deviance
@@ -202,7 +202,7 @@ def plotsModelfit(result):
     plt.title('Shape Check', fontsize=20)
     plt.tick_params(right='off',top='off')
     for side in ['top','right']: ax.spines[side].set_visible(False)
-    plt.ticklabel_format(style='sci',scilimits=(-2,2))
+    plt.ticklabel_format(style='sci',scilimits=(-2,4))
     
     ax = plt.subplot(1,3,3)
     # block number vs deviance
@@ -221,7 +221,7 @@ def plotsModelfit(result):
     plt.title('Time Dependence?', fontsize=20)
     plt.tick_params(right='off',top='off')
     for side in ['top','right']: ax.spines[side].set_visible(False)
-    plt.ticklabel_format(style='sci',scilimits=(-2,2))
+    plt.ticklabel_format(style='sci',scilimits=(-2,4))
     
     plt.tight_layout()
 
@@ -275,22 +275,22 @@ def plotMarginal(result,
     if CIpatch:
         xCI = np.array([CI[0], CI[1], CI[1], CI[0]])
         xCI = np.insert(xCI, 1, x[np.logical_and(x>=CI[0], x<=CI[1])])
-        yCI = np.array([np.interp(CI[0], x, marginal), np.interp(CI[0], x, marginal), 0, 0])
+        yCI = np.array([np.interp(CI[0], x, marginal), np.interp(CI[1], x, marginal), 0, 0])
         yCI = np.insert(yCI, 1, marginal[np.logical_and(x>=CI[0], x<=CI[1])])
         from matplotlib.patches import Polygon as patch
         color = .5*np.array(lineColor) + .5* np.array([1,1,1])
-        patch(np.array([xCI,yCI]).T, fc=color, ec=color)
+        axisHandle.add_patch(patch(np.array([xCI,yCI]).T, fc=color, ec=color))
     
     # plot prior
     if prior:
         xprior = np.linspace(min(x), max(x), 1000)
-        plt.plot(xprior, result['options']['priors'][dim](xprior), '--', c=priorColor)
+        plt.plot(xprior, result['options']['priors'][dim](xprior), '--', c=priorColor, clip_on=False)
     
     # posterior
-    plt.plot(x, marginal, lw=lineWidth, c=lineColor)
+    plt.plot(x, marginal, lw=lineWidth, c=lineColor, clip_on=False)
     # point estimate
     if plotPE:
-        plt.plot([Fit,Fit], [0, np.interp(Fit, x, marginal)], 'k')
+        plt.plot([Fit,Fit], [0, np.interp(Fit, x, marginal)], 'k', clip_on=False)
     
     #if tufteAxis:
         #TODO: tufteAxis
@@ -305,7 +305,7 @@ def plotMarginal(result,
     # else:
     plt.tick_params(direction='out', right='off', top='off')
     for side in ['top','right']: axisHandle.spines[side].set_visible(False)
-    plt.ticklabel_format(style='sci', scilimits=(-2,2))
+    plt.ticklabel_format(style='sci', scilimits=(-2,4))
     
     plt.hold(holdState)
     return axisHandle
@@ -331,11 +331,10 @@ if __name__ == "__main__":
     data = np.array([tmp1,tmp2,tmp3]).T
     result['data'] = data
     
-    import priors as p
     options['stimulusRange'] = 0
     options['widthalpha'] = .05
     options['betaPrior'] = 10
-    options['priors'] = p.getStandardPriors(data, options)    
+    options['priors'] = [lambda x: [74.074074196287796 for i in range(len(x))]]
     result['options'] = options
     
     CIs = np.zeros((5,2,3))
@@ -354,50 +353,50 @@ if __name__ == "__main__":
     result['marginals'] = marg
     
     m1x = np.array(
-    [0.0033,
-    0.0034,
-    0.0035,
-    0.0035,
-    0.0036,
-    0.0036,
-    0.0037,
-    0.0038,
-    0.0038,
-    0.0039,
-    0.0040,
-    0.0040,
-    0.0041,
-    0.0042,
-    0.0042,
-    0.0043,
-    0.0043,
-    0.0044,
-    0.0045,
-    0.0045,
-    0.0046,
-    0.0047,
-    0.0047,
-    0.0048,
-    0.0049,
-    0.0049,
-    0.0050,
-    0.0050,
-    0.0051,
-    0.0052,
-    0.0052,
-    0.0053,
-    0.0054,
-    0.0054,
-    0.0055,
-    0.0056,
-    0.0056,
-    0.0057,
-    0.0057,
-    0.0058])
+    [0.003327586206897,
+    0.003391246684350,
+    0.003454907161804,
+    0.003518567639257,
+    0.003582228116711,
+    0.003645888594164,
+    0.003709549071618,
+    0.003773209549072,
+    0.003836870026525,
+    0.003900530503979,
+    0.003964190981432,
+    0.004027851458886,
+    0.004091511936340,
+    0.004155172413793,
+    0.004218832891247,
+    0.004282493368700,
+    0.004346153846154,
+    0.004409814323607,
+    0.004473474801061,
+    0.004537135278515,
+    0.004600795755968,
+    0.004664456233422,
+    0.004728116710875,
+    0.004791777188329,
+    0.004855437665782,
+    0.004919098143236,
+    0.004982758620690,
+    0.005046419098143,
+    0.005110079575597,
+    0.005173740053050,
+    0.005237400530504,
+    0.005301061007958,
+    0.005364721485411,
+    0.005428381962865,
+    0.005492042440318,
+    0.005555702917772,
+    0.005619363395225,
+    0.005683023872679,
+    0.005746684350133,
+    0.005810344827586])
     marg = np.empty((5,),dtype=object)
     marg[0] = m1x
     result['marginalsX'] = marg
     
     #plotPsych(result,CIthresh=True)
-    #plotsModelfit(result)
-    plotMarginal(result)
+    plotsModelfit(result)
+    #plotMarginal(result)
