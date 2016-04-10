@@ -114,8 +114,7 @@ def psignifit(data, options):
         
     if not('fastOptim' in options.keys()):
         options['fastOptim'] = False
-        
-
+    
     if options['expType'] in ['2AFC', '3AFC', '4AFC']:            
         options['expN'] = int(float(options['expType'][0]))
         options['expType'] = 'nAFC'
@@ -136,8 +135,8 @@ def psignifit(data, options):
     else:
         raise ValueError('You specified an illegal experiment type')
     
-    assert((max(data[:,0]) - min(data[:,0]) > 0),   
-           'Your data does not have variance on the x-axis! This makes fitting impossible')
+    assert((max(data[:,0]) - min(data[:,0]) > 0), \
+                'Your data does not have variance on the x-axis! This makes fitting impossible')
                  
                      
     '''
@@ -154,6 +153,29 @@ def psignifit(data, options):
     else:
         options['logspace'] = 0
         
+    #if range was not given take from data
+    if options['stimulusRange'] <=1 :
+        if options['logspace']:
+            options['stimulusRange'] = np.array(np.log([min(data[:,0]),max(data[:,0])]))
+        else :
+            options['stimulusRange'] = np.array([min(data[:,0]),max(data[:,0])])
+
+        stimRangeSet = False
+    else:
+        stimRangeSet = True
+    if options['logspace']:
+        options['stimulusRange'] = np.log(options['stimulusRange'])
+    
+
+    if not('widthmin' in options.keys()):
+        if len(np.unique(data[:,0])) >1 and not(stimRangeSet):
+            if options['logspace']:
+                options['widthmin']  = min(np.diff(np.sort(np.unique(np.log(data[:,0])))))
+            else:
+                options['widthmin']  = min(np.diff(np.sort(np.unique(data[:,0]))))
+        else:
+            options['widthmin'] = 100*np.spacing(options['stimulusRange'][1])
+
     # add priors
     if options['threshPC'] != .5 and not(hasattr(options, 'priors')):
         warnings.warn('psignifit:TresholdPCchanged\n'\

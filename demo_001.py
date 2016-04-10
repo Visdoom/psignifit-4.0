@@ -29,18 +29,18 @@ data = np.array([[ 0.0010,   45.0000,   90.0000],[0.0015,   50.0000,   90.0000],
  of experiment you did and any other parameters of the fit you might want
  to set: '''
 
-' You can create an empty dictionary by simply calling [name]=lambda: 0 '
+' You can create an empty dictionary by simply calling name = {} '
 
-options  = lambda: 0   # initialize as an empty dict
+options  = {}   # initialize as an empty dict
 
 
 'Now you can set the different options with lines of the form'
-'[name].[field] as in the following lines:'
+'name[field] as in the following lines:'
 
-options.sigmoidName = 'norm'   # choose a cumulative Gauss as the sigmoid
-options.expType     = '2AFC'   ''' choose 2-AFC as the paradigm of the experiment
-                                this sets the guessing rate to .5 and
-                                fits the rest of the parameters '''
+options['sigmoidName'] = 'norm'   # choose a cumulative Gauss as the sigmoid
+options['expType']     = '2AFC'   #choose 2-AFC as the paradigm of the experiment
+                                    #this sets the guessing rate to .5 and
+                                    #fits the rest of the parameters 
 
 ''' There are 3 other types of experiments supported out of the box:
   n alternative forces choice. The guessing rate is known.

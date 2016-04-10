@@ -25,7 +25,6 @@ from getWeights import getWeights
 from getConfRegion import getConfRegion
 from getSeed import getSeed
 from marginalize import marginalize
-from utils import fill_kwargs
 
 def psignifitCore(data, options):
         

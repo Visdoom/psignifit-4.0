@@ -37,19 +37,6 @@ def getStandardPriors(data, options):
 
     priors = []    
     
-    """ treat logspace sigmoids """
-    if options['logspace']:
-        data[:,0] = np.log(data[:,0])
-        
-    ''' of range was not given take it from data '''
-    if np.ravel(options['stimulusRange']).size <= 1:
-        options['stimulusRange'] = np.array([np.min(data[:,0]), np.max(data[:,0])])
-        stimRangeSet = False
-    else:
-        stimRangeSet = True
-        if options['logspace']:
-            options['stimulusRange'] = np.log(options['stimulusRange'])
-    
     """ threshold """
     xspread = options['stimulusRange'][1]-options['stimulusRange'][0]
     ''' we assume the threshold is in the range of the data, for larger or
@@ -60,10 +47,7 @@ def getStandardPriors(data, options):
     
     """width"""
     # minimum = minimal difference of two stimulus levels
-    if len(np.unique(data[:,0])) >1 and not(stimRangeSet):
-        widthmin = np.min(np.diff(np.sort(np.unique(data[:,0]))))
-    else:
-        widthmin =100*np.spacing(options['stimulusRange'][1])
+    widthmin = options['widthmin']
     
     widthmax = xspread
     ''' We use the same prior as we previously used... e.g. we use the factor by

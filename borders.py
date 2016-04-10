@@ -9,7 +9,7 @@ Created on Sat Mar  5 17:14:59 2016
 import numpy as np
 import warnings 
 
-from utils import my_norminv, fill_kwargs
+from utils import my_norminv
 from getWeights import getWeights 
 from likelihood import likelihood
 from marginalize import marginalize
@@ -29,7 +29,7 @@ def setBorders(data,options):
               -the varscale to the full range from almost 0 to almost 1
     """
 
-
+    widthmin = options['widthmin']
     # lapse fix to 0 - .5    
     lapseB = np.array([0,.5])
     
@@ -42,18 +42,16 @@ def setBorders(data,options):
     
     # varscale from 0 to 1, 1 excluded!
     varscaleB = np.array([0, 1-np.exp(-20)])  
-    
-    if options['logspace']:
-        data[:,0] = np.log(data[:,0])
-    
+        
     # if range was not given take from data
-    if options['stimulusRange'].size <= 1 :
+    '''if options['stimulusRange'].size <= 1 :
         options['stimulusRange'] = np.array([min(data[:,0]), max(data[:,0])])
         stimRangeSet = False
     else:
         stimRangeSet= True
         if options['logspace']:
             options['stimulusRange'] = np.log(options['stimulusRange'])
+    '''
     
     '''
      We then assume it is one of the reparameterized functions with
@@ -62,15 +60,16 @@ def setBorders(data,options):
      .5 times it's spread
     '''
     dataspread = np.diff(options['stimulusRange'])
-    alphaB = np.array([options['stimulusRange'][0] - .5*dataspread, options['stimulusRange'][1] +.5*dataspread])
-    
+    alphaB = np.array([options['stimulusRange'][0] - .5*dataspread, options['stimulusRange'][1] +.5*dataspread]).squeeze()
+
     ''' the width we assume to be between half the minimal distance of
-    two points and 5 times the spread of the data '''
+    two points and 5 times the spread of the data 
     
     if len(np.unique(data[:,0])) > 1 and not(stimRangeSet):
         widthmin = np.min(np.diff(np.sort(np.unique(data[:,0]))))
     else :
         widthmin = 100*np.spacing(options['stimulusRange'][1])
+        '''
     
     ''' We use the same prior as we previously used... e.g. we use the factor by
     which they differ for the cumulative normal function '''
