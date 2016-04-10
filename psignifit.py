@@ -126,12 +126,12 @@ def psignifit(data, options):
         if not('stepN' in options.keys()):
             options['stepN'] = [40,40,20,20,20]
         if not('mbStepN' in options.keys()):
-            options['mbStepN'] = [25,20, 10,10,15]
+            options['mbStepN'] = [25,30, 10,10,15]
     elif options['expType'] == 'nAFC' or options['expType'] == 'equalAsymptote':
         if not('stepN' in options.keys()):
             options['stepN'] = [40,40,20,1,20]
         if not('mbStepN' in options.keys()):
-            options['mbStepN'] = [30,30,10,1,20]
+            options['mbStepN'] = [30,40,10,1,20]
     else:
         raise ValueError('You specified an illegal experiment type')
     
