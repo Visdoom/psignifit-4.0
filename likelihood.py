@@ -4,7 +4,7 @@ import scipy.special as sp
 
 def likelihood(data, options, args):
     """
-    calculates the (normalized) likelihood for the data from given parameters
+    Calculates the (normalized) likelihood for the data from given parameters
     function [p,logPmax] = likelihood(typeHandle,data,alpha,beta,lambda,gamma)
     This function computes the likelihood for specific parameter values from
     the log-Likelihood
@@ -29,8 +29,7 @@ def likelihood(data, options, args):
 
 def logLikelihood(data,options, args):
     """
-    Created on Mon Nov 30 22:19:05 2015
-    the core function to evaluate the logLikelihood of the data
+    The core function to evaluate the logLikelihood of the data
     function p=logLikelihood(data,options,alpha,beta,lambda,gamma,varscale)
     Calculates the logLikelihood of the given data with given parameter
     values. It is fully vectorized and contains the core calculations of
@@ -38,7 +37,6 @@ def logLikelihood(data,options, args):
     this actually adds the log priors as well. Technically it calculates the
     unnormalized log-posterior
     
-    @author: root
     """
 
     
