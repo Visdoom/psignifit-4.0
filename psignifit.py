@@ -224,10 +224,9 @@ def psignifit(data, options):
     if np.max(data[:,2]) == 1 or len(data) > options['nblocks']:
         warnings.warn('psignifit:pooling\n'\
             'We pooled your data, to avoid problems with n=1 blocks or to save time fitting because you have a lot of blocks\n'\
-            'You can force acceptence of your blocks by increasing options.nblocks')
+            'You can force acceptance of your blocks by increasing options.nblocks')
         data = poolData(data, options)
     
-    #options['nblocks'] = len(data)
     
     # create function handle of sigmoid
     options['sigmoidHandle'] = getSigmoidHandle(options)
@@ -243,10 +242,8 @@ def psignifit(data, options):
     
     options['borders'][border_idx[0]] = options['fixedPars'][border_idx[0]]
     options['borders'][border_idx[1]] = options['fixedPars'][border_idx[1]]
-    #options.borders[np.logical_not(np.isnan(options.fixedPars)),0] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]
-    #options.borders[np.logical_not(np.isnan(options.fixedPars)),1] = options.fixedPars[np.logical_not(np.isnan(options.fixedPars))]        
             
-    # normalize priors to first hoice of borders
+    # normalize priors to first choice of borders
     options['priors'] = p.normalizePriors(options)
     if options['moveBorders']:
         options['borders'] = b.moveBorders(data, options)

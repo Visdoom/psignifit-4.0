@@ -8,6 +8,7 @@ translated by Sophie Laturnus
 """
 import numpy as np
 import warnings
+from copy import deepcopy
 
 from utils import my_betapdf, my_norminv
 
@@ -143,6 +144,10 @@ def testForWarnings(testResult, parameter):
     if any(testResult == 0):
         warnings.warn("the prior you provided for %s returns zeros" % parameter)
 
+def normalizeFunction(func, integral):
+        
+    l = lambda x: func(x)/integral
+    return l
 
 def normalizePriors(options):
     """ 
@@ -159,6 +164,7 @@ def normalizePriors(options):
     """
     
     priors = []
+
     for idx in range(0,len(options['priors'])):
         if options['borders'][idx][1] > options['borders'][idx][0]:
             #choose xValues for calculation of the integral
@@ -168,11 +174,13 @@ def normalizePriors(options):
             w = np.convolve(np.diff(x), np.array([.5,.5]))
             integral = sum(y[:]*w[:])
             func = options['priors'][idx]
-            priors.append(lambda x: func(x)/ integral)
+            priors.append(normalizeFunction(func,integral))
         else:
             priors.append(lambda x: 1)
     
     return priors
+    
+
 
 
 if __name__ == "__main__":

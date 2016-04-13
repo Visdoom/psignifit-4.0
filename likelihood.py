@@ -196,15 +196,15 @@ def logLikelihood(data,options, args):
     if (options['priors']):
         if isinstance(options['priors'], list):
             if hasattr(options['priors'][0], '__call__'):
-                p = np.log(options['priors'][0](alpha)) + p
+                p += np.log(options['priors'][0](alpha))
             if hasattr(options['priors'][1], '__call__'):
-                p = p + np.log(options['priors'][1](beta))
+                p += np.log(options['priors'][1](beta))
             if hasattr(options['priors'][2], '__call__'):
-                p = p + np.log(options['priors'][2](lamb))
+                p += np.log(options['priors'][2](lamb))
             if hasattr(options['priors'][3], '__call__'):
-                p = p + np.log(options['priors'][3](gamma))
+                p += np.log(options['priors'][3](gamma))
             if hasattr(options['priors'][4], '__call__'):
-                p = p + np.log(options['priors'][4](varscaleOrig))
+                p += np.log(options['priors'][4](varscaleOrig))
     
 
     return p  
