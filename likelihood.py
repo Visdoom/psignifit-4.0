@@ -107,6 +107,7 @@ def logLikelihood(data,options, args):
         scale = 1-gamma -lamb
         psi = np.array([sigmoidHandle(x,alpha, beta) for x in data[:,0]])
         psi = gamma + scale*psi
+        psi = np.squeeze(psi)
         n = np.array(data[:,2])
         k = np.array(data[:,1])
         varscale = varscale**2;
@@ -192,20 +193,37 @@ def logLikelihood(data,options, args):
         
         p = np.concatenate((np.tile(pbin, [1,1,1,1,np.sum(vbinom)]),p), axis=4)
         p[np.isnan(p)] = -np.inf
-
+      
     if (options['priors']):
+        
         if isinstance(options['priors'], list):
             if hasattr(options['priors'][0], '__call__'):
-                p += np.log(options['priors'][0](alpha))
+                prior = np.log(options['priors'][0](alpha))
+                if not(oneParameter):
+                    prior = np.tile(prior, (1,) + p.shape[1:])
+                p += prior
             if hasattr(options['priors'][1], '__call__'):
-                p += np.log(options['priors'][1](beta))
+                prior = np.log(options['priors'][1](beta))
+                if not(oneParameter):
+                    prior = np.tile(prior, (p.shape[0],1) +p.shape[2:])
+                p += prior
             if hasattr(options['priors'][2], '__call__'):
-                p += np.log(options['priors'][2](lamb))
+                prior = np.log(options['priors'][2](lamb))
+                if not(oneParameter):
+                    prior = np.tile(prior,p.shape[0:2] + (1,) + p.shape[3:])
+                p += prior
             if hasattr(options['priors'][3], '__call__'):
-                p += np.log(options['priors'][3](gamma))
+                prior = np.log(options['priors'][3](gamma))
+                if not(oneParameter):
+                    prior = np.tile(prior, p.shape[0:3] +(1,p.shape[4]))
+                p += prior
             if hasattr(options['priors'][4], '__call__'):
-                p += np.log(options['priors'][4](varscaleOrig))
-    
+                prior = np.log(options['priors'][4](varscaleOrig))
+                if not(oneParameter):
+                    prior = np.tile(prior, p.shape[0:-1]+(1,))
+                else:
+                    prior = np.squeeze(prior)
+                p += prior
 
     return p  
 

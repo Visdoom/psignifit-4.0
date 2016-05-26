@@ -68,9 +68,8 @@ options['logspace']    = 0
 temp_data= importer.loadmat('variables.mat', struct_as_record=True,matlab_compatible=True)
 temp_options = importer.loadmat('options.mat', struct_as_record=False, squeeze_me=True)
 
-test_data = np.array([0.001,45,90])
 var = np.array([ 0.00466446,  0.00473373,  0,  0.5 ,0])
 
-- logLikelihood(test_data, options, var)
+- logLikelihood(data, options, var)
 
 

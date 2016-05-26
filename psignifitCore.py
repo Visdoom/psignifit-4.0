@@ -118,25 +118,27 @@ def psignifitCore(data, options):
             Fit = scipy.optimize.fmin(fun, x0, args = (a,), xtol=0, ftol = 0, maxiter = 100, maxfun=100)
             warnings.warn('changed options for optimization')
         else:            
-            Fit = scipy.optimize.fmin(fun, x0, args = (a,), disp = False)
+            Fit = scipy.optimize.fmin(fun, x0, args = (a,), disp = True)
           
         if options['expType'] == 'YesNo':
             result['Fit'] = deepcopy(Fit)
-        elif options['expType'] == 'nAFC': #TODO is this row or column vectors?
+        elif options['expType'] == 'nAFC': 
             fit = deepcopy(Fit[0:3])
             fit = np.append(fit, np.array([1/options['expN']]))
             fit = np.append(fit, deepcopy(Fit[3]))
-            result['Fit'] = fit.transpose()
+            result['Fit'] = fit
+            
         elif options['expType'] =='equalAsymptote':
             fit = deepcopy(Fit[0:3])
             fit = np.append(fit, Fit[2])
             fit = np.append(fit, Fit[3])
-            result['Fit'] = fit.transpose()
+            result['Fit'] = fit
         else:
             raise ValueError('unknown expType')
     
         par_idx = np.where(np.isnan(options['fixedPars']) == False)
-        result['Fit'][par_idx] = options['fixedPars'][par_idx] #TODO check
+        for idx in par_idx:
+            result['Fit'][idx] = options['fixedPars'][idx]
             
     elif options['estimateType'] == 'mean':
         # get mean estimate
