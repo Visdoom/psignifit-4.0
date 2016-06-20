@@ -9,6 +9,10 @@ Created on Mon Mar 14 17:34:08 2016
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+
+import marginalize
+from utils import my_norminv 
 
 def plotPsych(result,
               dataColor      = [0, 105./255, 170./255],
@@ -54,7 +58,6 @@ def plotPsych(result,
     else:
         ymin = 0
     
-    # TODO: need back compatibility??
     
     # PLOT DATA
     holdState = plt.ishold()
@@ -129,7 +132,7 @@ def plotPsych(result,
     plt.ticklabel_format(style='sci',scilimits=(-2,4))
     
     plt.hold(holdState)
-    
+    #plt.show() TODO make visible
     return axisHandle
 
 def plotsModelfit(result):
@@ -309,7 +312,282 @@ def plotMarginal(result,
     
     plt.hold(holdState)
     return axisHandle
+    
 
+def getColorMap():
+    """
+       This function returns the standard University of Tuebingen Colormap. 
+    """    
+    midBlue = np.array([165, 30, 55])/255
+    lightBlue = np.array([210, 150, 0])/255
+    steps = 200
+    
+    #m1 = np.array([np.linspace(midBlue[i], lightBlue[i], steps) for i in range(0,3)]).transpose()
+    #m2 = np.array([np.linspace(lightBlue[i], 1, steps) for i in range(0,3)]).transpose()
+    #m = np.append(m1,m2,0)
+    MAP = mcolors.LinearSegmentedColormap.from_list('Tuebingen', \
+                    [midBlue, lightBlue, [1,1,1]],N = steps, gamma = 1.0) 
+    
+    return MAP
+    
+def plotBayes(result, cmap = getColorMap()):
+
+    plt.clf()
+    plt.rc('text', usetex=True)
+    plt.set_cmap(cmap)
+    
+    if result['expType'] == 'equalAsymptote':
+        result['X1D'][3] = 0
+
+    for ix in range(0,4):
+        for jx in range(ix+1,5):
+            
+            plt.subplot(4,4,4*(ix-1)+jx-1)
+            #marginalize
+            marg = np.squeeze(marginalize(result,[ix,jx]))
+            e = [result['X1D'][jx][0], result['X1D'][jx][-1], \
+                 result['X1D'][ix][0], result['X1D'][ix][-1] ]
+            if marg.ndim == 1:
+                marg = np.reshape(marg, -1, 1)
+                if len(result['X1D'][i]) != 1:
+                    plt.imshow(marg, extend = e)    
+                else:
+                    plt.imshow(marg.transpose(), extend = e)
+            else:
+                plt.imshow(marg, extend = e)
+            
+            # axis labels
+            if ix == 0:
+                plt.ylabel('threshold')
+            elif ix == 1:
+                plt.ylabel('width')
+            elif ix == 2:
+                plt.ylabel(r'\lambda')
+            elif ix == 3:
+                plt.ylabel(r'\gamma')
+            
+            if jx == 0:
+                plt.xlabel('threshold')
+            elif jx == 1:
+                plt.xlabel('width')
+            elif jx == 2:
+                plt.xlabel(r'\lambda')
+            elif jx == 3:
+                plt.xlabel(r'\gamma')
+            elif jx == 4:
+                plt.xlabel(r'\eta')
+                
+            #TODO there is a one plot function I don't understand
+                
+    plt.show()
+    
+def plotPrior(result):
+    
+    """
+    This function creates the plot illustrating the priors on the different 
+    parameters
+    """
+
+    # plotting parameter
+    lineWidth = 2
+    lineColor = np.array([0,105,170])/255
+    markerSize = 30
+    
+    data = result['data']
+
+    if np.size(result['options']['stimulusRange'] <= 1):
+        result['options']['stimulusRange'] = np.array([min(data[:,0]), max(data[:,0])])
+        stimRangeSet = False
+    else:
+        stimRangeSet = True
+        
+    stimRange = result['options']['stimulusRange']
+    r = stimRange[1] - stimRange[0]
+    
+    # get borders for width
+    # minimum = minimal difference of two stimulus levels
+    
+    if len(np.unique(data[:,0])) > 1 and not(stimRangeSet):
+        widthmin = min(np.diff(np.sort(np.unique(data[:,0]))))
+    else:
+        widthmin = 100*np.spacing(stimRange[1])
+    # maximum = spread of the data
+
+    # We use the same prior as we previously used... e.g. we use the factor by
+    # which they differ for the cumulative normal function
+    Cfactor = (my_norminv(.95,0,1) - my_norminv(.05,0,1))/          \
+            (my_norminv(1-result['options']['widthalpha'], 0,1) -   \
+             my_norminv(result['options']['widthalpha'], 0,1))
+    widthmax = r
+    
+    steps = 10000
+    theta = np.empty(5)
+    for itheta in range(0,5):
+        if itheta == 0:
+            x = np.linspace(stimRange[0]-.5*r, stimRange[1]+.5*r, steps)
+        elif itheta == 1:
+            x = np.linspace(min(result['X1D'][itheta]), max(result['X1D'][1],),steps)
+        elif itheta == 2:
+            x = np.linspace(0,.5,steps)
+        elif itheta == 3:
+            x = np.linspace(0,.5,steps)
+        elif itheta == 4:                
+            x = np.linspace(0,1,steps)
+        
+        y = result['options']['priors'][itheta](x)
+        theta[itheta] = sum(x*y)/sum(y)
+        
+    if result['options']['expType'] == 'equalAsymptote':
+        theta[3] = theta[2]
+    if result['options']['expType'] == 'nAFC':
+        theta[3] = 1/result['options']['expN']
+        
+    # get limits for the psychometric function plots
+    xLimit = [stimRange[0] - .5*r , stimRange[1] +.5*r]
+    
+    """ threshold """
+    
+    xthresh = np.linspace(xLimit[0], xLimit[1], steps )
+    ythresh = result['options']['priors'][0](xthresh)
+    wthresh = np.convolve(np.diff(xthresh), .5*np.array([1,1])) #TODO is that the right function or rather the one from scipy.signal
+    cthresh = np.cumsum(ythresh*wthresh)
+    
+    plt.subplot(2,3,1)
+    plt.plot(xthresh,ythresh, lw = lineWidth, c= lineColor)
+    plt.hold(True)
+    plt.xlim(xLimit)
+    plt.title('Threshold', fontsize = 18)
+    plt.ylabel('Density',  fontsize = 18)
+    
+    plt.subplot(2,3,4)    
+    plt.plot(data[:,0], np.zeros(data[:,0].shape), 'k.', ls = None, ms = markerSize*.75 )
+    plt.hold(True)
+    plt.ylabel('Percent Correct', fontsize = 18)
+    plt.xlim(xLimit)
+    
+    for idot in range(0,5):
+        if idot == 0:
+            xcurrent = theta[0]
+            color = 'k'
+        elif idot == 1:
+            xcurrent = min(xthresh)
+            color = [1,200/255,0]
+        elif idot == 2:
+            tix = next(ix for ix in cthresh if ix >= .25)
+            xcurrent = xthresh[tix]
+            color = 'r'
+        elif idot == 3:
+            tix = next(ix for ix in cthresh if ix >= .75)
+            xcurrent = xthresh[tix]
+            color = 'b'
+        elif idot == 4:
+            xcurrent = max(xthresh)
+            color = 'g'
+        y = 100*(theta[3]+(1-theta[2])-theta[3])*result['options']['sigmoidHandle'](x,xcurrent, theta[1])
+        
+        plt.subplot(2,3,4)
+        plt.plot(x,y, '-', lw=lineWidth,c=color )
+        plt.subplot(2,3,1)
+        plt.plot(xcurrent, result['options']['priors'][0](xcurrent), '.',c=color, ls = None, ms = markerSize)
+    
+    """ width"""
+    xwidth = np.linspace(widthmin, 3/Cfactor*widthmax, steps)
+    ywidth = result['options']['priors'][1](xwidth)
+    wwidth = np.convolve(np.diff(xwidth), .5*np.array([1,1]))
+    cwidth = np.cumsum(ywidth*wwidth)
+
+    plt.subplot(2,3,2)
+    plt.plot(xwidth,ywidth,lw=lineWidth,c=lineColor)
+    plt.hold(True)
+    plt.xlim([widthmin,3/Cfactor*widthmax])
+    plt.title('Width',fontsize=18)
+
+    plt.subplot(2,3,5)
+    plt.plot(data[:,0],0,'k',ls = None,'.',ms =markerSize*.75)
+    plt.hold(True)
+    plt.xlim(xLimit)
+    plt.xlabel('Stimulus Level',fontsize=18)
+
+    x = np.linspace(xLimit[0],xLimit[1],steps)
+    for idot in range(0,5):
+        if idot == 0:
+            xcurrent = theta[1]
+            color = 'k'
+        elif idot == 1:
+            xcurrent = min(xwidth)
+            color = [1,200/255,0]
+        elif idot == 2:
+            wix = next(i for i in cwidth if i >= .25)
+            xcurrent = xwidth[wix]
+            color = 'r'
+        elif idot == 3:
+            wix = next(i for i in cwidth if i >= .75)
+            xcurrent = xwidth[wix]
+            color = 'b'
+        elif idot ==4:
+            xcurrent = max(xwidth)
+            color = 'g'
+    
+    y = 100*(theta[3]+ (1-theta[2] -theta[3])* result['options']['sigmoidHandle'](x,theta[0],xcurrent))
+    plt.subplot(2,3,5)
+    plt.plot(x,y,'-',lw = lineWidth, c= color)
+    plt.subplot(2,3,2)
+    plt.plot(xcurrent,result['options']['priors'][1](xcurrent),c = color,ls =None, '.',ms=markerSize)
+
+    """ lapse """
+
+    xlapse = np.linspace(0,.5,steps)
+    ylapse = result['options']['priors'][2](xlapse)
+    wlapse = np.convolve(np.diff(xlapse),.5*np.array([1,1]))
+    clapse = np.cumsum(ylapse*wlapse)
+    plt.subplot(2,3,3)
+    plt.plot(xlapse,ylapse,lw=lineWidth,c=lineColor)
+    plt.hold(True)
+    plt.xlim([0,.5])
+    plt.title('\lambda',fontsize=18)
+
+    plt.subplot(2,3,6)
+    plt.plot(data[:,0],0,'k',ls=None,'.',ms=markerSize*.75)
+    plt.hold(True)
+    plt.xlim(xLimit)
+
+
+    x = np.linspace(xLimit[0],xLimit[1],steps)
+    for idot in range(0,5):
+        if idot == 0:
+            xcurrent = theta[2]
+            color = 'k'
+        elif idot == 1:
+            xcurrent = 0
+            color = [1,200/255,0]
+        elif idot == 2:
+            lix = next(i for i in clapse if i >= .25)
+            xcurrent = xlapse[lix]
+            color = 'r'
+        elif idot == 3:
+            lix = next(i for i in clapse if i >= .75)
+            xcurrent = xlapse[lix]
+            color = 'b'
+        elif idot ==4:
+            xcurrent = .5
+            color = 'g'
+    y = 100*(theta[3]+ (1-xcurrent-theta[3])*result['options']['sigmoidHandle'](x,theta[0],theta[1]))
+    plt.subplot(2,3,6)
+    plt.plot(x,y,'-',lw=lineWidth,c=color)
+    plt.subplot(2,3,3)
+    plt.plot(xcurrent,result['options']['priors'][2](xcurrent),c=color,ls=None,'.',ms=markerSize)
+
+
+    a_handle = plt.gca
+    a_handle.set_position([200,300,1000,600])
+    fig, ax = plt.subplots()
+    
+    for item in [fig, ax]:
+        item.patch.set_visible(False)
+
+
+    
+    
 if __name__ == "__main__":
     result = {}
     

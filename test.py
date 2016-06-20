@@ -72,4 +72,13 @@ var = np.array([ 0.00466446,  0.00473373,  0,  0.5 ,0])
 
 - logLikelihood(data, options, var)
 
+ar = np.random.random([15,10,5,3]);
 
+alpha = np.ones([15,1,1,1])
+alpha = np.tile(alpha, ar.shape[1:])
+
+beta = np.ones([1,10,1,1])*0.5
+beta[0,2,0,0] = 0.3
+beta = np.tile(beta, (ar.shape[0],1)+ ar.shape[2:])
+
+ar += alpha

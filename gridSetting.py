@@ -102,7 +102,7 @@ def gridSetting(data,options,Seed):
                     local_N_eval = 10*local_N_eval
                     
                     if local_N_eval > 10**7:
-                        X1D[idx] = np.unique(np.array(X1D)) # ToDo check
+                        X1D[idx] = np.unique(np.array(X1D)) # TODO check
                         break
             else: 
                 X1D.append(options['borders'][idx,0])

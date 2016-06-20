@@ -27,6 +27,8 @@ from poolData import poolData
 from getSigmoidHandle import getSigmoidHandle
 from psignifitCore import psignifitCore
 
+from psigniplot import plotPsych
+
 def psignifit(data, options):
    
     #--------------------------------------------------------------------------
@@ -254,7 +256,7 @@ def psignifit(data, options):
     ''' after processing '''
     # check that the marginals go to nearly 0 at the borders of the grid
     if options['verbose'] > -5:
-        #TODO check
+    
         if result['marginals'][0][0] * result['marginalsW'][0][0] > .001:
             warnings.warn('psignifit:borderWarning\n'\
                 'The marginal for the threshold is not near 0 at the lower border.\n'\
@@ -275,11 +277,11 @@ def psignifit(data, options):
                 'This indicates that your data is not sufficient to exclude much higher widths.\n'\
                 'Refer to the paper or the manual for more info on this topic.')
     
-    result['timestamp'] = dt.now().strftime("%Y-%m-%d %H:%M:%S")
+    result['timestamp'] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    #if options.instantPlot:
-        #plotPsych(result)
-        #plotBayes(result) TODO implement and uncomment
+    if options['instantPlot']:
+        plotPsych(result)
+        #plotBayes(result)  #TODO
     
        
     

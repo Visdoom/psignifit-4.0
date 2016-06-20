@@ -21,24 +21,26 @@ confidence levels. (any shape of confP will be interpreted as a vector)
 """
 import numpy as np
 from marginalize import marginalize 
-def getConfRegion(result, nargout):
+def getConfRegion(result):
     
-    mode = result['options'].CImethod
+    mode = result['options']['CImethod']
     d = len(result['X1D'])
     
     ''' get confidence intervals for each parameter --> marginalize'''
-    conf_Intervals = np.zeros(d,2, len(result['options'].confP))
+    conf_Intervals = np.zeros((d,2, len(result['options']['confP'])))
+    confRegion = 0
     i = 0
-    for iConfP in result['options'].confP:
-        if nargout> 1 or mode == 'project':
-            order = np.array(result['Posterior'][:]).argsort()[::-1]
-            Mass = result['Posterior']*result['weight']
-            Mass = np.cumsum(Mass[order])
-            
-            confRegion = np.reshape(np.array([True]*np.size(result['Posterior']),result['Posterior'].shape))            
-            confRegion[order[Mass >= iConfP]] = False             
+    for iConfP in result['options']['confP']:
+#        if nargout> 1 or mode == 'project':
+           
     
         if mode == 'project':
+            order = np.array(result['Posterior'][:]).argsort()[::-1]
+            Mass = result['Posterior']*result['weight']
+            Mass = np.cumsum(Mass[order])        
+
+            confRegion = np.reshape(np.array([True]*np.size(result['Posterior']),result['Posterior'].shape))            
+            confRegion[order[Mass >= iConfP]] = False  
             for idx in range(0,d):
                 confRegionM = confRegion
                 for idx2 in range(0,d):
@@ -88,13 +90,13 @@ def getConfRegion(result, nargout):
             for idx in range(0,d):
                 (margin, x, weight1D) = marginalize(result, idx)
                 if len(x) == 1:
-                    start = x
-                    stop = x
+                    start = x[0]
+                    stop = x[0]
                 else:
                     Mass = margin*weight1D
                     cumMass = np.cumsum(Mass)
                     
-                    confRegionM = cumMass > (1-iConfP)/2 & cumMass < (1-(1-iConfP)/2)
+                    confRegionM = np.logical_and(cumMass > (1-iConfP)/2,cumMass < (1-(1-iConfP)/2))
                     if any(confRegionM):
                         alpha = (1-iConfP)/2
                         startIndex = confRegionM.flatten().nonzero()[0][0]
