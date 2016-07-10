@@ -132,7 +132,7 @@ def plotPsych(result,
     plt.ticklabel_format(style='sci',scilimits=(-2,4))
     
     plt.hold(holdState)
-    #plt.show() TODO make visible
+    plt.show() 
     return axisHandle
 
 def plotsModelfit(result):
@@ -503,7 +503,7 @@ def plotPrior(result):
     plt.title('Width',fontsize=18)
 
     plt.subplot(2,3,5)
-    plt.plot(data[:,0],0,'k',ls = None,'.',ms =markerSize*.75)
+    plt.plot(data[:,0],0,'k.',ls = None,ms =markerSize*.75)
     plt.hold(True)
     plt.xlim(xLimit)
     plt.xlabel('Stimulus Level',fontsize=18)
@@ -532,7 +532,7 @@ def plotPrior(result):
     plt.subplot(2,3,5)
     plt.plot(x,y,'-',lw = lineWidth, c= color)
     plt.subplot(2,3,2)
-    plt.plot(xcurrent,result['options']['priors'][1](xcurrent),c = color,ls =None, '.',ms=markerSize)
+    plt.plot(xcurrent,result['options']['priors'][1](xcurrent),'.',c = color,ls =None,ms=markerSize)
 
     """ lapse """
 
@@ -547,7 +547,7 @@ def plotPrior(result):
     plt.title('\lambda',fontsize=18)
 
     plt.subplot(2,3,6)
-    plt.plot(data[:,0],0,'k',ls=None,'.',ms=markerSize*.75)
+    plt.plot(data[:,0],0,'k.',ls=None,ms=markerSize*.75)
     plt.hold(True)
     plt.xlim(xLimit)
 
@@ -575,7 +575,7 @@ def plotPrior(result):
     plt.subplot(2,3,6)
     plt.plot(x,y,'-',lw=lineWidth,c=color)
     plt.subplot(2,3,3)
-    plt.plot(xcurrent,result['options']['priors'][2](xcurrent),c=color,ls=None,'.',ms=markerSize)
+    plt.plot(xcurrent,result['options']['priors'][2](xcurrent),'.',c=color,ls=None,ms=markerSize)
 
 
     a_handle = plt.gca
@@ -585,6 +585,84 @@ def plotPrior(result):
     for item in [fig, ax]:
         item.patch.set_visible(False)
 
+def plot2D(result,par1,par2, 
+           colorMap = getColorMap(), 
+            labelSize = 15,
+            fontSize = 10,
+            h = None):
+    """ 
+    This function constructs a 2 dimensional marginal plot of the posterior
+    density. This is the same plot as it is displayed in plotBayes in an
+    unmodifyable way.
+
+    The result struct is passed as result.
+    par1 and par2 should code the two parameters to plot:
+        0 = threshold
+        1 = width
+        2 = lambda
+        3 = gamma
+        4 = eta
+        
+    Further plotting options may be passed.
+    """
+    def strToDim(string):
+        """ Finds the number corresponding to a dim/parameter given as a string. """
+
+        s = string.lower()
+        if s in ['threshold','thresh','m','t','alpha']:
+            dim = 0
+            label = 'Treshold'
+        elif s in  ['width','w','beta']:
+            dim = 1
+            label = 'Width'
+        elif s in ['lapse','lambda','lapserate','lapse rate','lapse-rate','upper asymptote','l']:
+            dim = 2
+            label = '\lambda'
+        elif s in ['gamma','guess','guessrate','guess rate','guess-rate','lower asymptote','g']:
+            dim = 3
+            label = '\gamma'
+        elif s in ['sigma','std','s','eta','e']:
+            dim = 4
+            label = '\eta'
+        
+        return (dim, label)
+
+
+    # convert strings to dimension number
+    if not(par1.isdigit()):
+        par1,label1 = strToDim(par1)
+    if not(par2.isdigit()):
+        par2,label2 = strToDim(par2)
+
+    assert (isnumeric(par1) & isnumeric(par2) & par1 != par2), 'par1 and par2 must be different numbers to code for the parameters to plot'
+    assert (par1 in range(0,5) & par2 in range(0,5)) , 'par1 and par2 must be natural numbers up to 4 for the five parameters'
+
+    if h == None:
+        h = plt.gca
+
+    plt.axes(h)
+
+    plt.set_cmap(colorMap)
+    
+    marg = np.squeeze(marginalize(result, [par1, par2]))
+    
+    if par1 > par2 :
+        marg = marg.T
+
+
+    if 1 in marg.shape:
+        if len(result['X1D'][par1])==1:
+            plotMarginal(result,par2)
+        else:
+            plotMarginal(result,par2)
+    else:
+        e = [result['X1D'][par2],result['X1D'][par1]] # TODO check
+        plt.imshow(marg, extend = e)
+        plt.ylabel(label1,fontsize = labelSize)
+        plt.xlabel(label2,fontsize = labelSize)
+        
+        set(gca,'TickDir','out')
+        plt.box('off')
 
     
     

@@ -39,42 +39,42 @@ res=psignifit(data,options)
  after it follow some explanation and allowed values '''
 
 
-""" res.Fit = the fitted parameter of the psychometric function """
+""" res['Fit'] = the fitted parameter of the psychometric function """
 ''' Which kind of fit was performed is determined by the options you set. 
  It might be mean, median or MAP.
  The order of reported parameters is
  [threshold,width,lambda,gamma,eta]    '''
 
-""" res.conf_Intervals = confidence intervals for the fit """
+""" res['conf_Intervals'] = confidence intervals for the fit """
 ''' the confidence intervals for the 5 parameters.  
  The order of reported parameters is
  [threshold,width,lambda,gamma,eta]    '''
 
-""" res.data = data used for the fit """
+""" res['data'] = data used for the fit """
 ' the array used as data input for psignifit '
 
-""" res.options = the options struct used for the fit """
+""" res['options'] = the options used for the fit """
 ' contains all options set for the fit including automatically set values'
 
-""" res.timestamp = When the data result was created """
+""" res['timestamp'] = When the data result was created """
 
-""" res.Posterior = posterior density at the gridpoints """
+""" res['Posterior'] = posterior density at the gridpoints """
 ''' normalized Posterior density evaluated at the final gridpoints '''
 
-""" res.weight = integration weight for each gridpoint """
+""" res['weight'] = integration weight for each gridpoint """
 ''' this is the volume of parameter space each gridpoint "speaks for". This
  is needed for integrations over the space. '''
 
-""" res.X1D = positions of the gridpoints on the 5 dimensions """
+""" res['X1D'] = positions of the gridpoints on the 5 dimensions """
 ''' a cell array of vectors '''
 
-""" res.marginals   = marginal densities for the 5 parameters """
-""" res.marginalsX  = positions of the marginal evaluations """
-""" res.marginalsW  = integration weight for each gridpoint """
+""" res['marginals']   = marginal densities for the 5 parameters """
+""" res['marginalsX']  = positions of the marginal evaluations """
+""" res['marginalsW']  = integration weight for each gridpoint """
 ' Used together these three represent the marginal posterior distributions'
 
 
-""" res.logPmax, res.integral = normalization constants     """
+""" res['logPmax'], res['integral'] = normalization constants     """
 ''' the maximal log-likelihood which is subtracted prior to computing the
  exponential to avoid numerical problems 
  and the integral over the likelihood accross the parameter space, used
