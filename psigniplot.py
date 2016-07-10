@@ -8,6 +8,7 @@ Created on Mon Mar 14 17:34:08 2016
 """
 
 import numpy as np
+from scipy.signal import convolve as convn
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
@@ -395,7 +396,7 @@ def plotPrior(result):
     
     data = result['data']
 
-    if np.size(result['options']['stimulusRange'] <= 1):
+    if np.size(result['options']['stimulusRange']) <= 1:
         result['options']['stimulusRange'] = np.array([min(data[:,0]), max(data[:,0])])
         stimRangeSet = False
     else:
@@ -435,7 +436,7 @@ def plotPrior(result):
             x = np.linspace(0,1,steps)
         
         y = result['options']['priors'][itheta](x)
-        theta[itheta] = sum(x*y)/sum(y)
+        theta[itheta] = np.sum(x*y)/np.sum(y)
         
     if result['options']['expType'] == 'equalAsymptote':
         theta[3] = theta[2]
@@ -449,7 +450,7 @@ def plotPrior(result):
     
     xthresh = np.linspace(xLimit[0], xLimit[1], steps )
     ythresh = result['options']['priors'][0](xthresh)
-    wthresh = np.convolve(np.diff(xthresh), .5*np.array([1,1])) #TODO is that the right function or rather the one from scipy.signal
+    wthresh = convn(np.diff(xthresh), .5*np.array([1,1])) 
     cthresh = np.cumsum(ythresh*wthresh)
     
     plt.subplot(2,3,1)
@@ -460,7 +461,7 @@ def plotPrior(result):
     plt.ylabel('Density',  fontsize = 18)
     
     plt.subplot(2,3,4)    
-    plt.plot(data[:,0], np.zeros(data[:,0].shape), 'k.', ls = None, ms = markerSize*.75 )
+    plt.plot(data[:,0], np.zeros(data[:,0].shape), 'k.', ms = markerSize*.75 )
     plt.hold(True)
     plt.ylabel('Percent Correct', fontsize = 18)
     plt.xlim(xLimit)
@@ -473,12 +474,12 @@ def plotPrior(result):
             xcurrent = min(xthresh)
             color = [1,200/255,0]
         elif idot == 2:
-            tix = next(ix for ix in cthresh if ix >= .25)
-            xcurrent = xthresh[tix]
+            tix = cthresh[cthresh >=.25].size
+            xcurrent = xthresh[-tix]
             color = 'r'
         elif idot == 3:
-            tix = next(ix for ix in cthresh if ix >= .75)
-            xcurrent = xthresh[tix]
+            tix = cthresh[cthresh >= .75].size
+            xcurrent = xthresh[-tix]
             color = 'b'
         elif idot == 4:
             xcurrent = max(xthresh)
@@ -488,12 +489,12 @@ def plotPrior(result):
         plt.subplot(2,3,4)
         plt.plot(x,y, '-', lw=lineWidth,c=color )
         plt.subplot(2,3,1)
-        plt.plot(xcurrent, result['options']['priors'][0](xcurrent), '.',c=color, ls = None, ms = markerSize)
+        plt.plot(xcurrent, result['options']['priors'][0](xcurrent), '.',c=color, ms = markerSize)
     
     """ width"""
     xwidth = np.linspace(widthmin, 3/Cfactor*widthmax, steps)
     ywidth = result['options']['priors'][1](xwidth)
-    wwidth = np.convolve(np.diff(xwidth), .5*np.array([1,1]))
+    wwidth = convn(np.diff(xwidth), .5*np.array([1,1]))
     cwidth = np.cumsum(ywidth*wwidth)
 
     plt.subplot(2,3,2)
@@ -503,7 +504,7 @@ def plotPrior(result):
     plt.title('Width',fontsize=18)
 
     plt.subplot(2,3,5)
-    plt.plot(data[:,0],0,'k.',ls = None,ms =markerSize*.75)
+    plt.plot(data[:,0],np.zeros(data[:,0].size),'k.',ms =markerSize*.75)
     plt.hold(True)
     plt.xlim(xLimit)
     plt.xlabel('Stimulus Level',fontsize=18)
@@ -517,28 +518,28 @@ def plotPrior(result):
             xcurrent = min(xwidth)
             color = [1,200/255,0]
         elif idot == 2:
-            wix = next(i for i in cwidth if i >= .25)
-            xcurrent = xwidth[wix]
+            wix = cwidth[cwidth >= .25].size
+            xcurrent = xwidth[-wix]
             color = 'r'
         elif idot == 3:
-            wix = next(i for i in cwidth if i >= .75)
-            xcurrent = xwidth[wix]
+            wix = cwidth[cwidth >= .75].size
+            xcurrent = xwidth[-wix]
             color = 'b'
         elif idot ==4:
             xcurrent = max(xwidth)
             color = 'g'
     
-    y = 100*(theta[3]+ (1-theta[2] -theta[3])* result['options']['sigmoidHandle'](x,theta[0],xcurrent))
-    plt.subplot(2,3,5)
-    plt.plot(x,y,'-',lw = lineWidth, c= color)
-    plt.subplot(2,3,2)
-    plt.plot(xcurrent,result['options']['priors'][1](xcurrent),'.',c = color,ls =None,ms=markerSize)
+        y = 100*(theta[3]+ (1-theta[2] -theta[3])* result['options']['sigmoidHandle'](x,theta[0],xcurrent))
+        plt.subplot(2,3,5)
+        plt.plot(x,y,'-',lw = lineWidth, c= color)
+        plt.subplot(2,3,2)
+        plt.plot(xcurrent,result['options']['priors'][1](xcurrent),'.',c = color,ms=markerSize)
 
     """ lapse """
 
     xlapse = np.linspace(0,.5,steps)
     ylapse = result['options']['priors'][2](xlapse)
-    wlapse = np.convolve(np.diff(xlapse),.5*np.array([1,1]))
+    wlapse = convn(np.diff(xlapse),.5*np.array([1,1]))
     clapse = np.cumsum(ylapse*wlapse)
     plt.subplot(2,3,3)
     plt.plot(xlapse,ylapse,lw=lineWidth,c=lineColor)
@@ -547,7 +548,7 @@ def plotPrior(result):
     plt.title('\lambda',fontsize=18)
 
     plt.subplot(2,3,6)
-    plt.plot(data[:,0],0,'k.',ls=None,ms=markerSize*.75)
+    plt.plot(data[:,0],np.zeros(data[:,0].size),'k.',ms=markerSize*.75)
     plt.hold(True)
     plt.xlim(xLimit)
 
@@ -561,21 +562,21 @@ def plotPrior(result):
             xcurrent = 0
             color = [1,200/255,0]
         elif idot == 2:
-            lix = next(i for i in clapse if i >= .25)
-            xcurrent = xlapse[lix]
+            lix = clapse[clapse >= .25].size
+            xcurrent = xlapse[-lix]
             color = 'r'
         elif idot == 3:
-            lix = next(i for i in clapse if i >= .75)
-            xcurrent = xlapse[lix]
+            lix = clapse[clapse >= .75].size
+            xcurrent = xlapse[-lix]
             color = 'b'
         elif idot ==4:
             xcurrent = .5
             color = 'g'
-    y = 100*(theta[3]+ (1-xcurrent-theta[3])*result['options']['sigmoidHandle'](x,theta[0],theta[1]))
-    plt.subplot(2,3,6)
-    plt.plot(x,y,'-',lw=lineWidth,c=color)
-    plt.subplot(2,3,3)
-    plt.plot(xcurrent,result['options']['priors'][2](xcurrent),'.',c=color,ls=None,ms=markerSize)
+        y = 100*(theta[3]+ (1-xcurrent-theta[3])*result['options']['sigmoidHandle'](x,theta[0],theta[1]))
+        plt.subplot(2,3,6)
+        plt.plot(x,y,'-',lw=lineWidth,c=color)
+        plt.subplot(2,3,3)
+        plt.plot(xcurrent,result['options']['priors'][2](xcurrent),'.',c=color,ms=markerSize)
 
 
     a_handle = plt.gca
@@ -609,19 +610,19 @@ def plot2D(result,par1,par2,
         """ Finds the number corresponding to a dim/parameter given as a string. """
 
         s = string.lower()
-        if s in ['threshold','thresh','m','t','alpha']:
+        if s in ['threshold','thresh','m','t','alpha', '0']:
             dim = 0
             label = 'Treshold'
-        elif s in  ['width','w','beta']:
+        elif s in  ['width','w','beta', '1']:
             dim = 1
             label = 'Width'
-        elif s in ['lapse','lambda','lapserate','lapse rate','lapse-rate','upper asymptote','l']:
+        elif s in ['lapse','lambda','lapserate','lapse rate','lapse-rate','upper asymptote','l', '2']:
             dim = 2
             label = '\lambda'
-        elif s in ['gamma','guess','guessrate','guess rate','guess-rate','lower asymptote','g']:
+        elif s in ['gamma','guess','guessrate','guess rate','guess-rate','lower asymptote','g', '3']:
             dim = 3
             label = '\gamma'
-        elif s in ['sigma','std','s','eta','e']:
+        elif s in ['sigma','std','s','eta','e', '4']:
             dim = 4
             label = '\eta'
         
@@ -629,14 +630,11 @@ def plot2D(result,par1,par2,
 
 
     # convert strings to dimension number
-    if not(par1.isdigit()):
-        par1,label1 = strToDim(par1)
-    if not(par2.isdigit()):
-        par2,label2 = strToDim(par2)
+    par1,label1 = strToDim(par1)
+    par2,label2 = strToDim(par2)
 
-    assert (isnumeric(par1) & isnumeric(par2) & par1 != par2), 'par1 and par2 must be different numbers to code for the parameters to plot'
-    assert (par1 in range(0,5) & par2 in range(0,5)) , 'par1 and par2 must be natural numbers up to 4 for the five parameters'
-
+    assert (par1 != par2), 'par1 and par2 must be different numbers to code for the parameters to plot'
+    
     if h == None:
         h = plt.gca
 

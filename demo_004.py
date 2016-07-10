@@ -28,7 +28,7 @@ Staying with the standard
 from numpy import array, empty, nan
 import matplotlib.pyplot as plt
 
-import psignifit
+from psignifit import psignifit
 from psigniplot import plotPrior, plotPsych, plotMarginal
 '''to illustrate this we plot the priors from our original example from
 demo_001: '''
