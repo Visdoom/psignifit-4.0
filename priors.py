@@ -8,7 +8,7 @@ translated by Sophie Laturnus
 """
 import numpy as np
 import warnings
-from copy import deepcopy
+
 
 from utils import my_betapdf, my_norminv
 

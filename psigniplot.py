@@ -37,7 +37,6 @@ def plotPsych(result,
     This function produces a plot of the fitted psychometric function with 
     the data.
     """
-    # TODO: plotting options additionally as struct/dict ??
     
     fit = result['Fit']
     data = result['data']
@@ -228,9 +227,10 @@ def plotsModelfit(result):
     plt.ticklabel_format(style='sci',scilimits=(-2,4))
     
     plt.tight_layout()
+    plt.show()
 
 
-def plotMarginal(result,
+def plotMarginal(result,                  
                  dim        = 0,
                  lineColor  = [0, 105/255, 170/255],
                  lineWidth  = 2,
@@ -251,7 +251,7 @@ def plotMarginal(result,
     """
     from utils import strToDim
     if isinstance(dim,str): dim = strToDim(dim)
-    #TODO: check result['marginals'] type. assumed np.array(dtype=object)
+
     if len(result['marginals'][dim]) <= 1:
         raise ValueError('The parameter you wanted to plot was fixed in the analysis!')
     if axisHandle == None: axisHandle = plt.gca()
@@ -268,7 +268,7 @@ def plotMarginal(result,
     
     x        = result['marginalsX'][dim]
     marginal = result['marginals'][dim]
-    CI       = result['confIntervals'][dim,:,0]
+    CI       = np.hstack(result['conf_Intervals'][dim][0,:].T)
     Fit      = result['Fit'][dim]
     
     holdState = plt.ishold()
@@ -312,6 +312,7 @@ def plotMarginal(result,
     plt.ticklabel_format(style='sci', scilimits=(-2,4))
     
     plt.hold(holdState)
+    plt.show()
     return axisHandle
     
 
@@ -590,7 +591,7 @@ def plot2D(result,par1,par2,
            colorMap = getColorMap(), 
             labelSize = 15,
             fontSize = 10,
-            h = None):
+            axisHandle = None):
     """ 
     This function constructs a 2 dimensional marginal plot of the posterior
     density. This is the same plot as it is displayed in plotBayes in an
@@ -606,39 +607,20 @@ def plot2D(result,par1,par2,
         
     Further plotting options may be passed.
     """
-    def strToDim(string):
-        """ Finds the number corresponding to a dim/parameter given as a string. """
-
-        s = string.lower()
-        if s in ['threshold','thresh','m','t','alpha', '0']:
-            dim = 0
-            label = 'Treshold'
-        elif s in  ['width','w','beta', '1']:
-            dim = 1
-            label = 'Width'
-        elif s in ['lapse','lambda','lapserate','lapse rate','lapse-rate','upper asymptote','l', '2']:
-            dim = 2
-            label = '\lambda'
-        elif s in ['gamma','guess','guessrate','guess rate','guess-rate','lower asymptote','g', '3']:
-            dim = 3
-            label = '\gamma'
-        elif s in ['sigma','std','s','eta','e', '4']:
-            dim = 4
-            label = '\eta'
-        
-        return (dim, label)
-
-
+    from utils import strToDim
     # convert strings to dimension number
-    par1,label1 = strToDim(par1)
-    par2,label2 = strToDim(par2)
+    par1,label1 = strToDim(str(par1))
+    par2,label2 = strToDim(str(par2))
 
     assert (par1 != par2), 'par1 and par2 must be different numbers to code for the parameters to plot'
     
-    if h == None:
-        h = plt.gca
-
-    plt.axes(h)
+    if axisHandle == None:
+        axisHandle = plt.gca
+        
+    try:
+        plt.axes(axisHandle)
+    except TypeError:
+        raise ValueError('Invalid axes handle provided to plot in.')
 
     plt.set_cmap(colorMap)
     
@@ -659,9 +641,11 @@ def plot2D(result,par1,par2,
         plt.ylabel(label1,fontsize = labelSize)
         plt.xlabel(label2,fontsize = labelSize)
         
-        set(gca,'TickDir','out')
-        plt.box('off')
-
+    plt.tick_params(direction='out',right='off',top='off')
+    for side in ['top','right']: axisHandle.spines[side].set_visible(False)
+    plt.ticklabel_format(style='sci',scilimits=(-2,4))
+    
+    
     
     
 if __name__ == "__main__":
@@ -674,7 +658,7 @@ if __name__ == "__main__":
     options['expN'] = 2
     options['logspace'] = False
     options['threshPC'] = .5
-    from utils import my_norminv, my_normcdf
+    from utils import my_normcdf
     alpha = .05
     C = my_norminv(1-alpha,0,1)-my_norminv(alpha,0,1)
     options['sigmoidHandle'] = lambda X,m,width: my_normcdf(X, (m-my_norminv(.5,0,width/C)), width/C)    

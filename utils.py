@@ -122,12 +122,12 @@ def strToDim(string):
     """
     Finds the number corresponding to a dim/parameter given as a string. 
     """
-    string = string.lower()
-    if   string in ['threshold', 'thresh', 'm', 't', 'alpha']:    return 0
-    elif string in ['width', 'w', 'beta']:                        return 1
-    elif string in ['lapse', 'lambda', 'lapserate', 'lapse rate',
-                    'lapse-rate', 'upper asymptote', 'l']:        return 2
-    elif string in ['guess', 'gamma', 'guessrate', 'guess rate',
-                    'guess-rate', 'lower asymptote', 'g']:        return 3
-    elif string in ['sigma', 'std', 's']:                         return 4
-
+    s = string.lower()
+    if s in ['threshold','thresh','m','t','alpha', '0']:    return 0,'Threshold'
+    elif s in  ['width','w','beta', '1']:                   return 1,'Width'
+    elif s in ['lapse','lambda','lapserate','lapse rate','lapse-rate',
+               'upper asymptote','l', '2']:                 return 2, '\lambda'
+    elif s in ['gamma','guess','guessrate','guess rate',
+               'guess-rate','lower asymptote','g', '3']:    return 3, '\gamma'
+    elif s in ['sigma','std','s','eta','e', '4']:           return 4, '\eta'
+    

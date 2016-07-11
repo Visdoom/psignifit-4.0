@@ -11,10 +11,12 @@ DEMO_005 PLOTTING FUNCTIONS
 
 """
 
-import matplotlib.pyplot as plt
-import psignifit
+from numpy import array
 
-from psigiplot import *
+import matplotlib.pyplot as plt
+from psignifit import psignifit
+
+from psigniplot import *
 
 data = array([[0.0010,   45.0000,   90.0000],
                  [0.0015,   50.0000,   90.0000],
@@ -58,7 +60,8 @@ plotOptions = {'dataColor': [0,105/255,170/255],
                    'aspectRatio': False, 
                    'extrapolLength': .2, 
                    'CIthresh': False} 
- 
+
+plt.figure()
 plotPsych(res,plotOptions)
 
 """ plotMarginal """
@@ -67,8 +70,8 @@ As input it requires a results dictionary, the parameter to plot and optionally
 plotting options and a handle to an axis to plot in. 
 (As usual 1 = threshold, 2 = width, 3 = lambda, 4 = gamma, 5 = eta)'''
 
-plotOptions = dict()
-plotMarginal(result,plotOptions)
+plt.figure()
+plotMarginal(res)
 
 '''The gray shadow corresponds to the chosen confidence interval and the black 
 line shows the point estimate for the plotted parameter. 
@@ -95,8 +98,8 @@ As input this function expects the result dict, two numbers for the two paramete
 to plot against each other and optionally a handle h to the axis to plot in 
 and plotting options. '''
 
-plotOptions = dict()
-plot2D(result,plotOptions)  #TODO 
+plt.figure()
+plot2D(res,1,2)
 
 '''As options the following fields in plotOptions can be set: '''
 
@@ -112,8 +115,8 @@ plotOptions['label2']    = '[parameter name]'   # label for the second parameter
  It plots a grid of all 2 paramter combinations of marginals. 
  If a parameter is fixed in the analysis you will see a 1 dimensional plot 
  in the overview.'''
-
-plotBayes(result)
+plt.figure()
+plotBayes(res)
 
 '''You may provide a few additional plotting options. '''
 
@@ -121,8 +124,8 @@ plotBayes(result)
 """ plotPrior """
 '''As a tool this function plots the actually used priors of the provided 
 result dictionary. '''
-
-plotPrior(result)
+plt.figure()
+plotPrior(res)
  
  
  
