@@ -164,7 +164,7 @@ def psignifit(data, options):
         options['logspace'] = 0
         
     #if range was not given take from data
-    if options['stimulusRange'] <=1 :
+    if len(np.ravel(options['stimulusRange'])) <=1 :
         if options['logspace']:
             options['stimulusRange'] = np.array(np.log([min(data[:,0]),max(data[:,0])]))
         else :

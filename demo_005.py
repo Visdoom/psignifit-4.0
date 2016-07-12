@@ -61,7 +61,7 @@ plotOptions = {'dataColor': [0,105/255,170/255],
                    'extrapolLength': .2, 
                    'CIthresh': False} 
 
-plt.figure()
+#plt.figure()
 plotPsych(res,plotOptions)
 
 """ plotMarginal """
@@ -70,7 +70,7 @@ As input it requires a results dictionary, the parameter to plot and optionally
 plotting options and a handle to an axis to plot in. 
 (As usual 1 = threshold, 2 = width, 3 = lambda, 4 = gamma, 5 = eta)'''
 
-plt.figure()
+#plt.figure()
 plotMarginal(res)
 
 '''The gray shadow corresponds to the chosen confidence interval and the black 
@@ -98,13 +98,13 @@ As input this function expects the result dict, two numbers for the two paramete
 to plot against each other and optionally a handle h to the axis to plot in 
 and plotting options. '''
 
-plt.figure()
-plot2D(res,1,2)
+#plt.figure()
+plot2D(res,0,1)
 
 '''As options the following fields in plotOptions can be set: '''
 
-plotOptions['axisHandle']  = plt.gca            # axes handle to plot in
-plotOptions['colorMap']  = getColormap          # A colormap for the posterior
+plotOptions['axisHandle']  = plt.gca()    # axes handle to plot in
+plotOptions['colorMap']  = getColorMap()         # A colormap for the posterior
 plotOptions['labelSize'] = 15                   # FontSize for the labels
 plotOptions['fontSize']  = 10                   # FontSize for the ticks
 plotOptions['label1']    = '[parameter name]'   # label for the first parameter
@@ -115,7 +115,7 @@ plotOptions['label2']    = '[parameter name]'   # label for the second parameter
  It plots a grid of all 2 paramter combinations of marginals. 
  If a parameter is fixed in the analysis you will see a 1 dimensional plot 
  in the overview.'''
-plt.figure()
+#plt.figure()
 plotBayes(res)
 
 '''You may provide a few additional plotting options. '''

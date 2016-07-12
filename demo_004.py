@@ -112,7 +112,7 @@ options['expType'] = 'equalAsymptote'
 res = psignifit(data, options)
 
 # We first have a look at the fitted function
-plt.figure()
+#plt.figure()
 plotPsych(res)
 
 '''
@@ -128,7 +128,7 @@ plotPsych(res)
  marginal plot for the threshold as well:
 '''
 plt.figure()
-plotMarginal(res,1)
+plotMarginal(res,0)
 
 '''
  note that the dashed grey line, which marks the prior goes down where
@@ -141,6 +141,8 @@ plotMarginal(res,1)
  For our example dataset we might give a generous range and assume the
  possible range is .5 to 1.5 
 '''
+options = dict()
+options['expType'] = 'equalAsymptote'
 
 options['stimulusRange'] = array([.5,1.5])
 resRange = psignifit(data,options)
@@ -153,7 +155,7 @@ plotPrior(resRange)
 # threshold is now dominated by the data everywhere.
 
 plt.figure()
-plotMarginal(resRange,1)
+plotMarginal(resRange,0)
 
 # Finally we can also compare our new fitted psychometric function,
 # to see that even the point estimate for the psychometric function was

@@ -18,7 +18,6 @@ import numpy as np
 
 def marginalize(result, dimension):
    
-      #TODO make dimension checks suitable for 1 and 
       if isinstance(dimension, (int,float)):
           assert(dimension in range(0,5), 'the dimensions you want to marginalize to should be given as a number between 0 and 4')
           d = 1
@@ -56,9 +55,11 @@ def marginalize(result, dimension):
                   weight = np.reshape(weight, -1,1)
                   x = np.reshape(x,-1,1)
               else:
-                  marginal = np.array(marginal)
-                  weight = np.array(weight)
-                  x = result['X1D'][np.sort(dimension)] #TODO why the sort here?
+                  marginal = np.squeeze(marginal)
+                  weight = np.squeeze(marginal)
+                  x = []
+                  for ix in np.sort(dimension) : x.append(result['X1D'][ix]) 
+                  
                 
       return (marginal, x, weight)
 

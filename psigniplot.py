@@ -11,8 +11,9 @@ import numpy as np
 from scipy.signal import convolve as convn
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from matplotlib import cm
 
-import marginalize
+from marginalize import marginalize
 from utils import my_norminv 
 
 def plotPsych(result,
@@ -324,12 +325,9 @@ def getColorMap():
     lightBlue = np.array([210, 150, 0])/255
     steps = 200
     
-    #m1 = np.array([np.linspace(midBlue[i], lightBlue[i], steps) for i in range(0,3)]).transpose()
-    #m2 = np.array([np.linspace(lightBlue[i], 1, steps) for i in range(0,3)]).transpose()
-    #m = np.append(m1,m2,0)
     MAP = mcolors.LinearSegmentedColormap.from_list('Tuebingen', \
                     [midBlue, lightBlue, [1,1,1]],N = steps, gamma = 1.0) 
-    
+    cm.register_cmap(name = 'Tuebingen', cmap = MAP)
     return MAP
     
 def plotBayes(result, cmap = getColorMap()):
@@ -338,7 +336,7 @@ def plotBayes(result, cmap = getColorMap()):
     plt.rc('text', usetex=True)
     plt.set_cmap(cmap)
     
-    if result['expType'] == 'equalAsymptote':
+    if result['options']['expType'] == 'equalAsymptote':
         result['X1D'][3] = 0
 
     for ix in range(0,4):
@@ -346,17 +344,17 @@ def plotBayes(result, cmap = getColorMap()):
             
             plt.subplot(4,4,4*(ix-1)+jx-1)
             #marginalize
-            marg = np.squeeze(marginalize(result,[ix,jx]))
+            marg, _, _ = marginalize(result,np.array([ix,jx]))
             e = [result['X1D'][jx][0], result['X1D'][jx][-1], \
                  result['X1D'][ix][0], result['X1D'][ix][-1] ]
             if marg.ndim == 1:
-                marg = np.reshape(marg, -1, 1)
-                if len(result['X1D'][i]) != 1:
-                    plt.imshow(marg, extend = e)    
+                marg = np.reshape(marg, [-1, 1])
+                if len(result['X1D'][ix]) != 1:
+                    plt.imshow(marg, extent = e)    
                 else:
-                    plt.imshow(marg.transpose(), extend = e)
+                    plt.imshow(marg.transpose(), extent = e)
             else:
-                plt.imshow(marg, extend = e)
+                plt.imshow(marg, extent = e)
             
             # axis labels
             if ix == 0:
@@ -379,21 +377,18 @@ def plotBayes(result, cmap = getColorMap()):
             elif jx == 4:
                 plt.xlabel(r'\eta')
                 
-            #TODO there is a one plot function I don't understand
                 
     plt.show()
     
-def plotPrior(result):
+def plotPrior(result, 
+              lineWidth = 2, 
+              lineColor = np.array([0,105,170])/255,
+              markerSize = 30):
     
     """
     This function creates the plot illustrating the priors on the different 
     parameters
     """
-
-    # plotting parameter
-    lineWidth = 2
-    lineColor = np.array([0,105,170])/255
-    markerSize = 30
     
     data = result['data']
 
@@ -580,7 +575,7 @@ def plotPrior(result):
         plt.plot(xcurrent,result['options']['priors'][2](xcurrent),'.',c=color,ms=markerSize)
 
 
-    a_handle = plt.gca
+    a_handle = plt.gca()
     a_handle.set_position([200,300,1000,600])
     fig, ax = plt.subplots()
     
@@ -615,7 +610,7 @@ def plot2D(result,par1,par2,
     assert (par1 != par2), 'par1 and par2 must be different numbers to code for the parameters to plot'
     
     if axisHandle == None:
-        axisHandle = plt.gca
+        axisHandle = plt.gca()
         
     try:
         plt.axes(axisHandle)
@@ -624,7 +619,7 @@ def plot2D(result,par1,par2,
 
     plt.set_cmap(colorMap)
     
-    marg = np.squeeze(marginalize(result, [par1, par2]))
+    marg, _, _ = marginalize(result, np.array([par1, par2]))
     
     if par1 > par2 :
         marg = marg.T
@@ -636,15 +631,16 @@ def plot2D(result,par1,par2,
         else:
             plotMarginal(result,par2)
     else:
-        e = [result['X1D'][par2],result['X1D'][par1]] # TODO check
-        plt.imshow(marg, extend = e)
+        e = [result['X1D'][par2][0], result['X1D'][par2][-1], \
+             result['X1D'][par1][0], result['X1D'][par1][-1]]
+        plt.imshow(marg, extent = e)
         plt.ylabel(label1,fontsize = labelSize)
         plt.xlabel(label2,fontsize = labelSize)
         
     plt.tick_params(direction='out',right='off',top='off')
     for side in ['top','right']: axisHandle.spines[side].set_visible(False)
     plt.ticklabel_format(style='sci',scilimits=(-2,4))
-    
+    plt.show()    
     
     
     
