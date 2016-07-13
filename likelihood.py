@@ -158,7 +158,11 @@ def logLikelihood(data,options, args):
             ki = np.array(data[i,1])
             
             if ((ni-ki)>0 and ki > 0):
-                pbin = pbin + ki * np.log(psi) + (ni-ki)*np.log(1-psi)
+                psi[psi < 1E-200] = 1E-200
+                temp = 1-psi
+                temp[temp < 1E-200] = 1E-200
+                
+                pbin = pbin + ki * np.log(psi) + (ni-ki)*np.log(temp)
                 if (v.size != 0):
                     a = psi * v
                     b = (1-psi)*v
@@ -168,6 +172,7 @@ def logLikelihood(data,options, args):
                 else:
                     p = np.array([])
             elif ki > 0:    # --> ni-ki == 0
+                psi[psi < 1E-200] = 1E-200
                 pbin  = pbin + ki * np.log(psi);
                 if (v.size != 0):                                             
                     a = psi*v
@@ -198,27 +203,41 @@ def logLikelihood(data,options, args):
         
         if isinstance(options['priors'], list):
             if hasattr(options['priors'][0], '__call__'):
-                prior = np.log(options['priors'][0](alpha))
+                temp = options['priors'][0](alpha)
+                if len(np.ravel(temp)) > 1: temp[temp < 1E-200] = 1E-200
+                prior = np.log(temp)
                 if not(oneParameter):
                     prior = np.tile(prior, (1,) + p.shape[1:])
                 p += prior
             if hasattr(options['priors'][1], '__call__'):
-                prior = np.log(options['priors'][1](beta))
+                temp = options['priors'][1](beta)
+                if len(np.ravel(temp)) > 1: temp[temp < 1E-200] = 1E-200         
+                
+                prior = np.log(temp)
                 if not(oneParameter):
                     prior = np.tile(prior, (p.shape[0],1) +p.shape[2:])
                 p += prior
             if hasattr(options['priors'][2], '__call__'):
-                prior = np.log(options['priors'][2](lamb))
+                temp = options['priors'][2](lamb)
+                if len(np.ravel(temp)) > 1: temp[temp < 1E-200] = 1E-200             
+                
+                prior = np.log(temp)
                 if not(oneParameter):
                     prior = np.tile(prior,p.shape[0:2] + (1,) + p.shape[3:])
                 p += prior
             if hasattr(options['priors'][3], '__call__'):
-                prior = np.log(options['priors'][3](gamma))
+                temp = options['priors'][3](gamma)
+                if len(np.ravel(temp)) > 1: temp[temp < 1E-200] = 1E-200             
+                
+                prior = np.log(temp)
                 if not(oneParameter):
                     prior = np.tile(prior, p.shape[0:3] +(1,p.shape[4]))
                 p += prior
             if hasattr(options['priors'][4], '__call__'):
-                prior = np.log(options['priors'][4](varscaleOrig))
+                temp = options['priors'][4](varscaleOrig)
+                if len(np.ravel(temp)) > 1: temp[temp < 1E-200] = 1E-200                
+                
+                prior = np.log(temp)
                 if not(oneParameter):
                     prior = np.tile(prior, p.shape[0:-1]+(1,))
                 else:

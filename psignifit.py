@@ -173,8 +173,8 @@ def psignifit(data, options):
         stimRangeSet = False
     else:
         stimRangeSet = True
-    if options['logspace']:
-        options['stimulusRange'] = np.log(options['stimulusRange'])
+        if options['logspace']:
+            options['stimulusRange'] = np.log(options['stimulusRange'])
     
 
     if not('widthmin' in options.keys()):
@@ -356,7 +356,7 @@ def psignifitCore(data, options):
             for idx in range(0,d):
                 # If there is an actual Interval
                 if options['borders'][idx, 0] < options['borders'][idx,1]: 
-                    #result.X1D[id] = linspace(bla)
+                    
                     result['X1D'].append(np.linspace(options['borders'][idx,0], options['borders'][idx,1],
                                     num=options['stepN'][idx]))
                 # if parameter was fixed
@@ -364,8 +364,7 @@ def psignifitCore(data, options):
                     result['X1D'].append(np.array([options['borders'][idx,0]]))
                     
     '''Evaluate likelihood and form it into a posterior'''
-    #kwargs = {'alpha': None, 'beta':None , 'lambda': None,'gamma':None , 'varscale':None }
-    #fill_kwargs(kwargs,result['X1D'])
+    
     (result['Posterior'], result['logPmax']) = l.likelihood(data, options, result['X1D'])
     result['weight'] = getWeights(result['X1D'])
     integral = np.sum(np.array(result['Posterior'][:])*np.array(result['weight'][:]))

@@ -116,13 +116,13 @@ def getConfRegion(result):
                         MMid = cumMass[index] -Mass[index]/2
                         start = x[index] + ((1-iConfP)/2 - MMid)/margin[index]
                         stop = x[index] + ((1-(1-iConfP)/2)-MMid)/margin[index]
-                conf_Intervals[idx,:,i] = [start, stop]
+                conf_Intervals[idx,:,i] = np.array([start, stop])
                        
         else:
             raise ValueError('You specified an invalid mode')
                 
         i += 1
-    return (conf_Intervals, confRegion)
+    return conf_Intervals
 
 if __name__ == "__main__":
     import sys

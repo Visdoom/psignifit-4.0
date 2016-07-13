@@ -123,9 +123,7 @@ def plotPsych(result,
     plt.xlabel(xLabel, fontname=fontName, fontsize=labelSize)
     plt.ylabel(yLabel, fontname=fontName, fontsize=labelSize)
     if aspectRatio: axisHandle.set_aspect(2/(1 + np.sqrt(5)))
-#    if tufteAxis:
-# TODO: tufteaxis
-#    else:
+
     plt.ylim([ymin, 1])
     # tried to mimic box('off') in matlab, as box('off') in python works differently
     plt.tick_params(direction='out',right='off',top='off')
@@ -254,10 +252,12 @@ def plotMarginal(result,
     if isinstance(dim,str): dim = strToDim(dim)
 
     if len(result['marginals'][dim]) <= 1:
-        raise ValueError('The parameter you wanted to plot was fixed in the analysis!')
+        print('Error: The parameter you wanted to plot was fixed in the analysis!')
+        return
     if axisHandle == None: axisHandle = plt.gca()
     try:
         plt.axes(axisHandle)
+        plt.rc('text', usetex=True)
     except TypeError:
         raise ValueError('Invalid axes handle provided to plot in.')
     if not xLabel:
@@ -265,11 +265,11 @@ def plotMarginal(result,
         elif dim == 1: xLabel = 'Width'
         elif dim == 2: xLabel = '\lambda'
         elif dim == 3: xLabel = '\gamma'
-        elif dim == 4: xLabel = '\sigma'
+        elif dim == 4: xLabel = '\eta'
     
     x        = result['marginalsX'][dim]
     marginal = result['marginals'][dim]
-    CI       = np.hstack(result['conf_Intervals'][dim][0,:].T)
+    CI       = np.hstack(result['conf_Intervals'][dim].T)
     Fit      = result['Fit'][dim]
     
     holdState = plt.ishold()
@@ -297,9 +297,6 @@ def plotMarginal(result,
     if plotPE:
         plt.plot([Fit,Fit], [0, np.interp(Fit, x, marginal)], 'k', clip_on=False)
     
-    #if tufteAxis:
-        #TODO: tufteAxis
-    #else:
     plt.xlim([min(x), max(x)])
     plt.ylim([0, 1.1*max(marginal)])
     
