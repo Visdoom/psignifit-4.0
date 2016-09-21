@@ -19,10 +19,10 @@ import numpy as np
 def marginalize(result, dimension):
    
       if isinstance(dimension, (int,float)):
-          assert(dimension in range(0,5), 'the dimensions you want to marginalize to should be given as a number between 0 and 4')
+          assert dimension in range(0,5), 'the dimensions you want to marginalize to should be given as a number between 0 and 4'
           d = 1
       else: 
-          assert(dimension.all() in range(0,5), 'the dimensions you want to marginalize to should be given as a vector of numbers 0 to 4')
+          assert dimension.all() in range(0,5), 'the dimensions you want to marginalize to should be given as a vector of numbers 0 to 4'
           d = len(result['X1D'])
         
       if d == 1 and ('marginals' in result.keys()) and len(result['marginals'])-1 >= dimension:
@@ -33,10 +33,10 @@ def marginalize(result, dimension):
           if not('Posterior' in result.keys()):
               raise ValueError('marginals cannot be computed anymore because posterior was dropped')
           else:
-              assert(np.shape(result['Posterior']) == np.shape(result['weight']), 'dimensions mismatch in marginalization')
+              assert (np.shape(result['Posterior']) == np.shape(result['weight'])), 'dimensions mismatch in marginalization'
                 
               if len(dimension) == 1:
-                  x = result['X1D'][dimension][:]
+                  x = result['X1D'][int(dimension)][:]
               else:
                   x = np.nan
               

@@ -127,7 +127,7 @@ plotPsych(res)
  You can see how the prior influences the result by looking at the
  marginal plot for the threshold as well:
 '''
-plt.figure()
+#plt.figure()
 plotMarginal(res,0)
 
 '''

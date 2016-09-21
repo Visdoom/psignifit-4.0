@@ -263,9 +263,9 @@ def plotMarginal(result,
     if not xLabel:
         if   dim == 0: xLabel = 'Threshold'
         elif dim == 1: xLabel = 'Width'
-        elif dim == 2: xLabel = '\lambda'
-        elif dim == 3: xLabel = '\gamma'
-        elif dim == 4: xLabel = '\eta'
+        elif dim == 2: xLabel = r'$\lambda$'
+        elif dim == 3: xLabel = r'$\gamma$'
+        elif dim == 4: xLabel = r'$\eta$'
     
     x        = result['marginalsX'][dim]
     marginal = result['marginals'][dim]
@@ -339,7 +339,7 @@ def plotBayes(result, cmap = getColorMap()):
     for ix in range(0,4):
         for jx in range(ix+1,5):
             
-            plt.subplot(4,4,4*(ix-1)+jx-1)
+            plt.subplot(4,4,4*ix+jx)
             #marginalize
             marg, _, _ = marginalize(result,np.array([ix,jx]))
             e = [result['X1D'][jx][0], result['X1D'][jx][-1], \
@@ -359,20 +359,20 @@ def plotBayes(result, cmap = getColorMap()):
             elif ix == 1:
                 plt.ylabel('width')
             elif ix == 2:
-                plt.ylabel(r'\lambda')
+                plt.ylabel(r'$\lambda$')
             elif ix == 3:
-                plt.ylabel(r'\gamma')
+                plt.ylabel(r'$\gamma$')
             
             if jx == 0:
                 plt.xlabel('threshold')
             elif jx == 1:
                 plt.xlabel('width')
             elif jx == 2:
-                plt.xlabel(r'\lambda')
+                plt.xlabel(r'$\lambda$')
             elif jx == 3:
-                plt.xlabel(r'\gamma')
+                plt.xlabel(r'$\gamma$')
             elif jx == 4:
-                plt.xlabel(r'\eta')
+                plt.xlabel(r'$\eta')
                 
                 
     plt.show()

@@ -43,6 +43,9 @@ def my_t1icdf(p):
 
 def my_betapdf(x,a,b):
     ''' this implements the betapdf with less input checks '''
+    
+    if type(x) is int or float:
+        x = array(x)
 
     # Initialize y to zero.
     y = zeros(shape(x))
@@ -126,8 +129,8 @@ def strToDim(string):
     if s in ['threshold','thresh','m','t','alpha', '0']:    return 0,'Threshold'
     elif s in  ['width','w','beta', '1']:                   return 1,'Width'
     elif s in ['lapse','lambda','lapserate','lapse rate','lapse-rate',
-               'upper asymptote','l', '2']:                 return 2, '\lambda'
+               'upper asymptote','l', '2']:                 return 2, r'$\lambda$'
     elif s in ['gamma','guess','guessrate','guess rate',
-               'guess-rate','lower asymptote','g', '3']:    return 3, '\gamma'
-    elif s in ['sigma','std','s','eta','e', '4']:           return 4, '\eta'
+               'guess-rate','lower asymptote','g', '3']:    return 3, r'$\gamma$'
+    elif s in ['sigma','std','s','eta','e', '4']:           return 4, r'$\eta$'
     

@@ -46,7 +46,7 @@ res = psignifit(data, options)
 '''This funciton plots the fitted psychometric function with the measured data. 
  It takes the result dict you want to plot. You can also set plotting options.'''
  
-plotOptions = {'dataColor': [0,105/255,170/255],
+plotOptions = {'dataColor': [0,round(105/255,3),round(170/255,3)],
                    'plotData':    True, 
                    'lineColor': [0,0,0],
                    'lineWidth': 2,
@@ -80,7 +80,7 @@ The prior is also included in the plot as a gray dashed line.'''
 '''You may set the following options again with their
  respective default values assigned to change the behaviour of the plot:'''
 plotOptions['dim'] = 0
-plotOptions['lineColor'] = [0,105/255,170/255]      # color of the density
+plotOptions['lineColor'] = [0,round(105/255,3),round(170/255,3)]      # color of the density
 plotOptions['lineWidth']      = 2                   # width of the plotline
 plotOptions['xLabel']         = '[parameter name] '   # X-Axis label
 plotOptions['yLabel']         = 'Marginal Density'  # Y-Axis label
@@ -124,7 +124,7 @@ plotBayes(res)
 """ plotPrior """
 '''As a tool this function plots the actually used priors of the provided 
 result dictionary. '''
-plt.figure()
+#plt.figure()
 plotPrior(res)
  
  
