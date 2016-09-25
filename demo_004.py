@@ -47,6 +47,7 @@ data = array([[0.0010,   45.0000,   90.0000],
                  [0.0080,   90.0000,   90.0000],
                  [0.0100,   90.0000,   90.0000]])
 
+
 options = dict()
 options['expType'] = '2AFC'
 options['sigmoidName'] = 'norm'
@@ -105,7 +106,7 @@ data=array([[1.5000,   3.0000,   3.0000],
             [1.3703,   2.0000,   3.0000]])
 
 # We fit this assuming the same lapse rate for yes and for no
-options = dict()
+
 options['expType'] = 'equalAsymptote'
 # by default this gives us a cumulative normal fit, which is fine for now.
 
@@ -141,7 +142,7 @@ plotMarginal(res,0)
  For our example dataset we might give a generous range and assume the
  possible range is .5 to 1.5 
 '''
-options = dict()
+
 options['expType'] = 'equalAsymptote'
 
 options['stimulusRange'] = array([.5,1.5])

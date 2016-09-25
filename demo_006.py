@@ -7,7 +7,8 @@
 
 from numpy import array
 from psignifit import psignifit, psignifitFast
-from evaluate import *
+from psigniplot import plotsModelfit
+from evaluate import getThreshold, getSlope, getSlopePC, biasAna
 
 '''
  We will need some fitted function for illustration. Thus we first fit our
@@ -49,7 +50,8 @@ res = psignifit(data,options)
  For example: This call will find the value at which our function reaches
  90% correct:
 '''
-getThreshold(res,0.9)
+(thresh, ci) = getThreshold(res,0.9) 
+print('Threshold:', thresh)
 ''' 
  which should be 0.0058 
 
@@ -57,7 +59,9 @@ getThreshold(res,0.9)
  middle of the psychometric function independent of the guessing and lapse
  rate:
 '''
-getThreshold(res,0.5,1)
+(thresh, ci) = getThreshold(res,0.5,1)
+print('Threshold:', thresh)
+
 ''' 
  which should be 0.0046, which is exactly the definition of the threshold
  we use in the fitting.
@@ -65,7 +69,9 @@ getThreshold(res,0.5,1)
  The function also computes worst case credible intervals for the
  threshold. 
 '''
-[threshold,CI] = getThreshold(res,0.5,1)
+(thresh,ci) = getThreshold(res,0.5,1)
+print('Threshold:', thresh)
+print('CI:', ci)
 '''
  The credible intervals are for the confidence levels given for your
  function fit. 
@@ -85,24 +91,27 @@ getThreshold(res,0.5,1)
  level. 
 '''
  #For example: 
-getSlope(res,0.006)
+slope = getSlope(res,0.006)
+print(slope)
 # Will yield the slope at 0.006, which is 89.0673
 '''
  getSlopePC(res,pCorrect,unscaled), will calculate the slope at a given 
  percent correct.
 ''' 
 # For example: 
-getSlopePC(res,0.6)
+slope =getSlopePC(res,0.6)
+print(slope)
 ''' 
  Will yield the slope at the value where the psychometric function reaches
- 60% correct (at 0.0034). This slope is 89.0673.
+ 60% correct (at 0.0034). This slope is 98.316.
 
  as for the getThreshold function, the unscaled option allows you to
  specify the percent correct on the unscaled sigmoid instead. 
  For example we can calculate the slope at the midpoint of the
  psychometric function using:
 '''
-getSlopePC(res,0.5,1)
+slope = getSlopePC(res,0.5,1)
+print(slope)
 # This slope is 140.0991
 
 """ Bias Analysis """

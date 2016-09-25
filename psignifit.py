@@ -20,7 +20,7 @@ To get an introduction to basic usage start with demo001
 import numpy as np
 import datetime as dt
 import warnings
-from copy import deepcopy
+from copy import copy,deepcopy
 import scipy
 
 import likelihood as l 
@@ -37,7 +37,7 @@ from getSigmoidHandle import getSigmoidHandle
 
 from psigniplot import plotPsych
 
-def psignifit(data, options):
+def psignifit(data, opts = {}):
    
     #--------------------------------------------------------------------------
     #input parsing
@@ -50,10 +50,7 @@ def psignifit(data, options):
         data[:,1] = round(map( lambda x, y: x*y, data[:,2],data[:,1])) # we try to convert into our notation
         
     # options
-        
-    if not('options' in locals()): 
-        options = {}
-
+    options = copy(opts)
     if not('sigmoidName' in options.keys()):
         options['sigmoidName'] = 'norm'
     
