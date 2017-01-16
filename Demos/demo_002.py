@@ -9,7 +9,7 @@ you can set for the fitting process as a user.
 
 """
 from numpy import array, exp
-import psignifit
+from psignifit import psignifit
 # to have some data we use the data from demo_001
 
 data = array([[0.0010,   45.0000,   90.0000],

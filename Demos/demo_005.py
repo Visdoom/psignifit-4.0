@@ -31,7 +31,7 @@ data = array([[0.0010,   45.0000,   90.0000],
                  [0.0070,   88.0000,   90.0000],
                  [0.0080,   90.0000,   90.0000],
                  [0.0100,   90.0000,   90.0000]])
-                 
+
 
 
 
@@ -45,24 +45,24 @@ res = psignifit(data, options)
 """ plotPsych """
 '''This funciton plots the fitted psychometric function with the measured data. 
  It takes the result dict you want to plot. You can also set plotting options.'''
- 
-plotOptions = {'dataColor': [0,round(105/255,3),round(170/255,3)],
-                   'plotData':    True, 
-                   'lineColor': [0,0,0],
-                   'lineWidth': 2,
-                   'xLabel' : 'Stimulus Level', 
-                   'yLabel' : 'PercentCorrect', 
-                   'labelSize' : 15, 
-                   'fontSize' : 10, 
-                   'fontName' : 'Helvetica', 
-                   'tufteAxis' : False,
-                   'plotPar' : True, 
-                   'aspectRatio': False, 
-                   'extrapolLength': .2, 
-                   'CIthresh': False} 
-
-#plt.figure()
-plotPsych(res,plotOptions)
+'''
+'dataColor': array([0,round(105/255,3),round(170/255,3)]),
+'plotData':    True,
+'lineColor': array([0.0,0.0,0.0]),
+'lineWidth': 2,
+'xLabel' : 'Stimulus Level',
+'yLabel' : 'PercentCorrect',
+'labelSize' : 15,
+'fontSize' : 10,
+'fontName' : 'Helvetica',
+'tufteAxis' : False,
+'plotPar' : True,
+'aspectRatio': False,
+'extrapolLength': .2,
+'CIthresh': False
+'''
+plt.figure()
+plotPsych(res,lineWidth = 5)
 
 """ plotMarginal """
 '''This function plots the marginal posterior density for a single parameter. 
@@ -70,7 +70,7 @@ As input it requires a results dictionary, the parameter to plot and optionally
 plotting options and a handle to an axis to plot in. 
 (As usual 1 = threshold, 2 = width, 3 = lambda, 4 = gamma, 5 = eta)'''
 
-#plt.figure()
+plt.figure()
 plotMarginal(res)
 
 '''The gray shadow corresponds to the chosen confidence interval and the black 
@@ -79,6 +79,7 @@ The prior is also included in the plot as a gray dashed line.'''
 
 '''You may set the following options again with their
  respective default values assigned to change the behaviour of the plot:'''
+'''
 plotOptions['dim'] = 0
 plotOptions['lineColor'] = [0,round(105/255,3),round(170/255,3)]      # color of the density
 plotOptions['lineWidth']      = 2                   # width of the plotline
@@ -91,41 +92,44 @@ plotOptions['priorColor']     = [.7,.7,.7]          # color of the prior distibu
 plotOptions['CIpatch']        = True                # draw the patch for the confidence interval
 plotOptions['plotPE']         = True                # plot the point estimate?
 
-
+'''
 """ plot2D """
 ''' This plots 2 dimensional posterior marginals. 
 As input this function expects the result dict, two numbers for the two parameters 
 to plot against each other and optionally a handle h to the axis to plot in 
 and plotting options. '''
 
-#plt.figure()
+plt.figure()
 plot2D(res,0,1)
 
 '''As options the following fields in plotOptions can be set: '''
-
+'''
 plotOptions['axisHandle']  = plt.gca()    # axes handle to plot in
 plotOptions['colorMap']  = getColorMap()         # A colormap for the posterior
 plotOptions['labelSize'] = 15                   # FontSize for the labels
 plotOptions['fontSize']  = 10                   # FontSize for the ticks
 plotOptions['label1']    = '[parameter name]'   # label for the first parameter
 plotOptions['label2']    = '[parameter name]'   # label for the second parameter
+'''
 
 """ plotBayes """
 ''' This function is a tool to look at the posterior density of the parameter. 
  It plots a grid of all 2 paramter combinations of marginals. 
  If a parameter is fixed in the analysis you will see a 1 dimensional plot 
  in the overview.'''
-#plt.figure()
+plt.figure()
 plotBayes(res)
 
+print('done')
 '''You may provide a few additional plotting options. '''
 
 
 """ plotPrior """
 '''As a tool this function plots the actually used priors of the provided 
 result dictionary. '''
-#plt.figure()
+plt.figure()
 plotPrior(res)
+
  
  
  

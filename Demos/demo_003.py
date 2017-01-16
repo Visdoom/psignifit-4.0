@@ -5,7 +5,7 @@ Which information is contained in the result of Psignifit
 """
 
 from numpy import array
-import psignifit
+from psignifit import psignifit
 # to have some data we use the data from demo_001
 
 data = array([[0.0010,   45.0000,   90.0000],

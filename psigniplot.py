@@ -4,7 +4,7 @@ Created on Mon Mar 14 17:34:08 2016
 
 
 
-@author: Ole
+@author: Ole and Sophie
 """
 
 import numpy as np
@@ -342,16 +342,23 @@ def plotBayes(result, cmap = getColorMap()):
             plt.subplot(4,4,4*ix+jx)
             #marginalize
             marg, _, _ = marginalize(result,np.array([ix,jx]))
-            e = [result['X1D'][jx][0], result['X1D'][jx][-1], \
-                 result['X1D'][ix][0], result['X1D'][ix][-1] ]
+            e = np.array([result['X1D'][jx][0], result['X1D'][jx][-1], \
+                 result['X1D'][ix][0], result['X1D'][ix][-1] ])
+            if e[0] == e[1]:
+                e[0] -= 0.5
+                e[1] += 0.5
+            if e[2] == e[3]:
+                e[2] -= 0.5
+                e[3] += 0.5
             if marg.ndim == 1:
                 marg = np.reshape(marg, [-1, 1])
                 if len(result['X1D'][ix]) != 1:
-                    plt.imshow(marg, extent = e)    
+                    plt.imshow(marg, extent = e, aspect='auto')
+
                 else:
-                    plt.imshow(marg.transpose(), extent = e)
+                    plt.imshow(marg.transpose(), extent = e, aspect='auto')
             else:
-                plt.imshow(marg, extent = e)
+                plt.imshow(marg, extent = e, aspect='auto')
             
             # axis labels
             if ix == 0:
@@ -376,7 +383,8 @@ def plotBayes(result, cmap = getColorMap()):
                 
                 
     plt.show()
-    
+
+
 def plotPrior(result, 
               lineWidth = 2, 
               lineColor = np.array([0,105,170])/255,
@@ -572,12 +580,13 @@ def plotPrior(result,
         plt.plot(xcurrent,result['options']['priors'][2](xcurrent),'.',c=color,ms=markerSize)
 
 
-    a_handle = plt.gca()
-    a_handle.set_position([200,300,1000,600])
-    fig, ax = plt.subplots()
-    
-    for item in [fig, ax]:
-        item.patch.set_visible(False)
+    # a_handle = plt.gca()
+    # a_handle.set_position([200,300,1000,600])
+    # fig, ax = plt.subplots()
+    #
+    # for item in [fig, ax]:
+    #     item.patch.set_visible(False)
+    plt.show()
 
 def plot2D(result,par1,par2, 
            colorMap = getColorMap(), 
